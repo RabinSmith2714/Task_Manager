@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Faculty;
@@ -28,7 +29,10 @@ class userController extends Controller
         ]);
 
         // Find the user in the Faculty model
-        $faculty = Faculty::where('id', $request->faculty_id)->first();
+        $faculty = Faculty::where('id', $request->faculty_id)
+            ->join('specialroles', 'faculty.id', '=', 'specialroles.id') // Joining Specialrole table
+            ->select('faculty.*', 'specialroles.*') // Selecting all faculty fields + Status from Specialrole
+            ->first();
         // Check if user exists and password matches
         if ($faculty && $faculty->pass === $request->password) {
             // Store    user information in session
@@ -37,6 +41,8 @@ class userController extends Controller
                 'role' => $faculty->role,
                 'faculty_name' => $faculty->name,
                 'department' => $faculty->dept,
+                'roleStatus' => $faculty->Status,
+                'rolename'=> $faculty->Role,
             ]);
 
             // Return JSON success response for AJAX
@@ -61,12 +67,14 @@ class userController extends Controller
         $role = session('role');
         $facultyName = session('faculty_name');
         $department = session('department');
+        $roleStatus = session('roleStatus');
+        $roleName = session('rolename');
         $dept = Department::all();
         $deptfaculty = Faculty::where('status', '1')->where('id', '!=', $facultyId)->get();
         $assigned_task = Maintask::select('task_id', 'title', 'description', 'deadline')->where('status', 0)->where('assigned_by_id', $facultyId)->groupBy('task_id', 'title', 'description', 'deadline')->get();
         $dashboard_assigned_task = Maintask::where('status', 0)
-        ->where('assigned_by_id', $facultyId)
-        ->count();
+            ->where('assigned_by_id', $facultyId)
+            ->count();
         //My tasks queries
         $my_det1 = Mainbranch::where('assigned_to_id', $facultyId)
             ->whereIn('status', ['0', '2'])
@@ -105,7 +113,7 @@ class userController extends Controller
             )->get();
 
         // Fetch main tasks
-        $mainTasks = Maintask::whereIn('Maintask.task_id', $my_det1)->join('Mainbranch','Mainbranch.task_id','=','Maintask.task_id')
+        $mainTasks = Maintask::whereIn('Maintask.task_id', $my_det1)->join('Mainbranch', 'Mainbranch.task_id', '=', 'Maintask.task_id')
 
 
             ->select('Maintask.title', 'Maintask.description', 'Maintask.assigned_by_name', 'Maintask.deadline', 'Maintask.task_id', 'Mainbranch.status')
@@ -122,16 +130,16 @@ class userController extends Controller
             ->select('maintask.task_id', 'maintask.title', 'maintask.description', 'maintask.assigned_by_name', 'maintask.deadline') // Select required columns
             ->get();
         $overdue_subTasks = Subtask::whereIn('subtask.task_id', $my_det2)->where('assigned_to_id', $facultyId)
-        ->join('maintask', 'subtask.task_id', '=', 'maintask.task_id')
-        ->where('subtask.deadline', '<', $currentDate) // Join Maintask table
-        ->select(
-            'maintask.title',
-            'maintask.description',
-            'subtask.assigned_by_name',
-            'subtask.deadline',
-            'subtask.task_id',
-            'subtask.status'
-        )->get();
+            ->join('maintask', 'subtask.task_id', '=', 'maintask.task_id')
+            ->where('subtask.deadline', '<', $currentDate) // Join Maintask table
+            ->select(
+                'maintask.title',
+                'maintask.description',
+                'subtask.assigned_by_name',
+                'subtask.deadline',
+                'subtask.task_id',
+                'subtask.status'
+            )->get();
         $overdueTasks = $overdue_MainTasks->concat($overdue_subTasks);
         $dashboard_overdueTasks = $overdue_MainTasks->concat($overdue_subTasks)->count();
 
@@ -333,7 +341,7 @@ class userController extends Controller
                 'Subtask.deadline'
             )
             ->get();
-            
+
         $completed_assigntask = $completedassignMaintask->concat($completedassignSubtask);
         $dashcompleted_my_task = $completedMainTasks->concat($completedSubtasks)->count();
         $dashcompleted_assigntask = $completedassignMaintask->concat($completedassignSubtask)->count();
@@ -343,22 +351,22 @@ class userController extends Controller
         $today = now();
         $tomorrow = now()->addDay();
         $disclaimertasks = DB::table('maintask')
-        ->join('mainbranch', 'maintask.task_id', '=', 'mainbranch.task_id')  // Updated join condition using task_id
-        // Check if assigned_to_id matches facultyId
-        ->join('subtask', function ($join) {
-            $join->on('subtask.task_id', '=', 'mainbranch.task_id')
-                 ->orOn('subtask.task_id', '=', 'mainbranch.task_id');
-        })
-        ->whereIn('maintask.status', $statuses)
-        ->whereBetween('maintask.deadline', [$today->startOfDay(), $tomorrow->endOfDay()])
-        ->select('maintask.title', 'maintask.deadline', 'maintask.description')
-        ->orderBy('maintask.deadline', 'asc')
-        ->distinct()
-        ->get();
+            ->join('mainbranch', 'maintask.task_id', '=', 'mainbranch.task_id')  // Updated join condition using task_id
+            // Check if assigned_to_id matches facultyId
+            ->join('subtask', function ($join) {
+                $join->on('subtask.task_id', '=', 'mainbranch.task_id')
+                    ->orOn('subtask.task_id', '=', 'mainbranch.task_id');
+            })
+            ->whereIn('maintask.status', $statuses)
+            ->whereBetween('maintask.deadline', [$today->startOfDay(), $tomorrow->endOfDay()])
+            ->select('maintask.title', 'maintask.deadline', 'maintask.description')
+            ->orderBy('maintask.deadline', 'asc')
+            ->distinct()
+            ->get();
 
 
 
-        return view('index', compact('facultyId', 'facultyName', 'role', 'department', 'dept', 'deptfaculty', 'assigned_task', 'my_det1', 'my_det2', 'combinedTasks', 'forwarded_task', 'tasks', 'mainTasks', 'completed_my_task', 'completed_assigntask', 'overdueTasks', 'currentDate', 'disclaimertasks', 'dashboard_assigned_task', 'dashboardcombinedTasks','dashboard_completed_tasks','dashboard_overdueTasks'));
+        return view('index', compact('facultyId', 'facultyName', 'role', 'department', 'dept', 'deptfaculty', 'assigned_task', 'my_det1', 'my_det2', 'combinedTasks', 'forwarded_task', 'tasks', 'mainTasks', 'completed_my_task', 'completed_assigntask', 'overdueTasks', 'currentDate', 'disclaimertasks', 'dashboard_assigned_task', 'dashboardcombinedTasks', 'dashboard_completed_tasks', 'dashboard_overdueTasks'));
     }
 
     //Add task
