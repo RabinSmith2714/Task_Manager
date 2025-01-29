@@ -1456,7 +1456,6 @@
                     @endif
 
                     <!-- My Task (Only for Management Heads (1), Center Heads (2), HOD (3), Faculty (4)) -->
-                    @if($specialStatus == 1 || $specialStatus == 2 || $specialStatus == 3 || $specialStatus == 4)
                         <li class="nav-item" role="presentation">
                             <div id="navref3">
                                 <button class="nav-link" id="mytask-bus-tab" data-bs-toggle="tab"
@@ -1467,7 +1466,7 @@
                                 </button>
                             </div>
                         </li>
-                    @endif
+                 
 
                     <!-- Completed Task (Visible to Everyone) -->
                     <li class="nav-item" role="presentation">
@@ -1710,9 +1709,7 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="work-bus-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Forwarded task</button>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="work-bus-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Overdue</button>
-                            </li>
+                           
                         </ul>
                         <div class="tab-content" id="myTabContent">
                             <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
@@ -1744,13 +1741,13 @@
                                                     <td class="text-center">{{$my->title}}</td>
                                                     <td class="text-center">{{$my->description}}</td>
                                                     <td class="text-center">
-                                                    @if($my->status==0)
+                                                    @if($specialStatus == 3 && $my->status == 0)
                                                         
                                                         <button type="button" class="btn btn-success btnaccept"
                                                             value="{{$my->task_id}}" >
                                                             <i class="fas fa-check"></i>
                                                         </button>
-                                                        @else if($my->status == 1)
+                                                    @ifelse(($specialStatus == 1 && $my->status == 0) || ($specialStatus == 2 && $my->status == 0))
                                                         <button type="button"
                                                             class="btn btn-primary showImage"
                                                             data-bs-toggle="modal"
@@ -1760,11 +1757,9 @@
                                                             data-deadline="{{ $my->deadline }}"> <!-- Add the deadline as a data attribute -->
                                                             <i class="fas fa-share"></i>
                                                         </button>
-                                                        <button type="button" class="btn btn-success btnaccept"
-                                                            value="{{$my->task_id}}">
-                                                            <i class="fas fa-check"></i>
-                                                        </button><br>
-                                                        @endif
+                                                    
+                                                        
+                                                    @endif
                                                     <td class="text-center">{{\Carbon\Carbon::parse($my->deadline)->format('d-m-Y') }}</td>
                                                 </tr>
                                                 @endforeach
@@ -1811,44 +1806,7 @@
                                     </table>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
-                                <div class="custom-table table-responsive">
-                                    <table class="table mb-0 table-hover " id="overdue1">
-                                        <thead class="gradient-header">
-                                            <tr>
-                                                <th class="text-center">S.No</th>
-                                                <th class="text-center">Task ID</th>
-                                                <th class="text-center">Assigned by</th>
-                                                <th class="text-center">Title</th>
-                                                <th class="text-center">Task Description</th>
-                                                <th class="text-center">Action</th>
-                                                <th class="text-center">Deadline</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @php $sno=1 @endphp
-                                            @foreach ($overdueTasks as $over)
-                                            <tr>
-                                                <td class="text-center">{{$sno++}}</td>
-                                                <td class="text-center">{{$over->task_id}}</td>
-                                                <td class="text-center"> {{$over->assigned_by_name}} </td>
-                                                <td class="text-center">{{$over->title}}</td>
-                                                <td class="text-center">{{$over->description}}</td>
-                                                @if ($over->status==2)
-                                                <td class="text-center"><button type="button" class="btn btn-success btnovercomplete"
-                                                        value="{{$over->task_id}}" diasbled>
-                                                        @else
-                                                <td class="text-center"><button type="button" class="btn btn-success btnovercomplete"
-                                                        value="{{$over->task_id}}">
-                                                        @endif
-                                                        <i class="fas fa-check"></i></button></td>
-                                                <td class="text-center">{{\Carbon\Carbon::parse($over->deadline)->format('d-m-Y') }}</td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                     <!----------------------- My Task Ends ------------------------------------->
@@ -2207,7 +2165,7 @@
                             <div class="p-2 mb-3 rounded d-flex justify-content-between bg-light " id="forwardfacultyDetailsHeader" style="color: #333; font-weight: bold;">
                             </div>
 
-                            <table class="table text-center align-middle rounded shadow-sm table-hover table-bordered">
+                            <table class="table text-center align-middle rounded shadow-sm table-hover table-bordered" >
                                 <thead class="text-white bg-dark">
                                     <tr>
                                         <th scope="col">S No</th>

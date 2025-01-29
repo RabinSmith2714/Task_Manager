@@ -102,7 +102,7 @@ class userController extends Controller
         // Query sub tasks and join with main tasks to fetch title and description
         $subTasks = Subtask::whereIn('subtask.task_id', $my_det2)->where('assigned_to_id', $facultyId)
             ->join('maintask', 'subtask.task_id', '=', 'maintask.task_id')
-            ->where('subtask.deadline', '>=', $currentDate) // Join Maintask table
+            // Join Maintask table
             ->select(
                 'maintask.title',
                 'maintask.description',
@@ -117,7 +117,7 @@ class userController extends Controller
 
 
             ->select('Maintask.title', 'Maintask.description', 'Maintask.assigned_by_name', 'Maintask.deadline', 'Maintask.task_id', 'Mainbranch.status')
-            ->where('Maintask.deadline', '>=', $currentDate)
+            
             ->get();
 
         // Combine results
