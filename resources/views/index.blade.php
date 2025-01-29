@@ -1455,8 +1455,9 @@
                         </li>
                     @endif
 
+
                     <!-- My Task (Only for Management Heads (1), Center Heads (2), HOD (3), Faculty (4)) -->
-                    @if($specialStatus == 1 || $specialStatus == 2 || $specialStatus == 3)
+                    @if($specialStatus == 1 || $specialStatus == 2 || $specialStatus == 3 || $specialStatus == 4)
                         <li class="nav-item" role="presentation">
                             <div id="navref3">
                                 <button class="nav-link" id="mytask-bus-tab" data-bs-toggle="tab"
@@ -1468,6 +1469,7 @@
                             </div>
                         </li>
                     @endif
+
 
                     <!-- Completed Task (Visible to Everyone) -->
                     <li class="nav-item" role="presentation">

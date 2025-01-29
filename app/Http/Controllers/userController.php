@@ -74,19 +74,18 @@ class userController extends Controller
             ->where('assigned_by_id', $facultyId)
             ->count();
 
-            $specialStatus = Specialrole::where('id', $facultyId)->value('Status');
+             // Check if the user exists in the Specialrole table
+    $specialStatus = Specialrole::where('id', $facultyId)->value('Status');
 
-            $specialStatus = Specialrole::where('id', $facultyId)->value('Status');
+    // If not found in Specialrole, check Faculty table
+    if (is_null($specialStatus)) {
+        $faculty = Faculty::where('id', $facultyId)
+                          ->where('role', 'faculty')
+                          ->first();
 
-            if (is_null($specialStatus)) {
-                // Check in the faculty table where status is 1 and role is 'faculty'
-                $faculty = Faculty::where('id', $facultyId)
-                                  ->where('status', 1)
-                                  ->where('role', 'faculty')
-                                  ->first();
-
-                $specialStatus = $faculty ? 1 : null; // Assign 1 only if faculty exists with role 'faculty'
-            }
+        // If found in Faculty, assign status 4 (Faculty)
+        $specialStatus = $faculty ? 4 : null;
+    }
 
 
             //My tasks queries
