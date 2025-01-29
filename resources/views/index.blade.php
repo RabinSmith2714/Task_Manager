@@ -1420,7 +1420,7 @@
         <!-- Breadcrumb -->
         <div class="breadcrumb-area">
             <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
+                <ol class="mb-0 breadcrumb">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Task Manager</li>
                 </ol>
@@ -1431,49 +1431,63 @@
             <!-- Sample Table -->
             <div id="navref">
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <!-- Dashboard (Always Visible) -->
                     <li class="nav-item" role="presentation">
                         <div id="navref1">
                             <button class="nav-link active" id="dash-bus-tab" data-bs-toggle="tab"
                                 data-bs-target="#dashboard" type="button" role="tab"
-                                aria-controls="home-tab-pane" aria-selected="true"><i
-                                    class="fa-solid fa-folder-open fa-bounce"></i>&nbsp;Dashboard</button>
-                        </div>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <div id="navref2">
-                            <button class="nav-link" id="pend-bus-tab" data-bs-toggle="tab"
-                                data-bs-target="#assignedtask" type="button" role="tab"
-                                aria-controls="profile-tab-pane" aria-selected="false"><i
-                                    class="fa-solid  fa-bell fa-shake "></i>&nbsp;Assigned Task
+                                aria-controls="home-tab-pane" aria-selected="true">
+                                <i class="fa-solid fa-folder-open fa-bounce"></i>&nbsp;Dashboard
                             </button>
                         </div>
                     </li>
-                    <li class="nav-item" role="presentation">
-                        <div id="navref3">
-                            <button class="nav-link" id="mytask-bus-tab" data-bs-toggle="tab"
-                                data-bs-target="#mytask" type="button" role="tab"
-                                aria-controls="contact-tab-pane" aria-selected="false"><i
-                                    class="fa-solid fa-exclamation fa-beat-fade"
-                                    style="--fa-beat-fade-opacity: 0.1; --fa-beat-fade-scale: 1.25;"></i>&nbsp;My Task
-                            </button>
-                        </div>
-                    </li>
+
+                    <!-- Assigned Task (Only for Principal (0), Management Heads (1), HOD (3)) -->
+                    @if($specialStatus == 0 || $specialStatus == 1 || $specialStatus == 3)
+                        <li class="nav-item" role="presentation">
+                            <div id="navref2">
+                                <button class="nav-link" id="pend-bus-tab" data-bs-toggle="tab"
+                                    data-bs-target="#assignedtask" type="button" role="tab"
+                                    aria-controls="profile-tab-pane" aria-selected="false">
+                                    <i class="fa-solid fa-bell fa-shake "></i>&nbsp;Assigned Task
+                                </button>
+                            </div>
+                        </li>
+                    @endif
+
+                    <!-- My Task (Only for Management Heads (1), Center Heads (2), HOD (3), Faculty (4)) -->
+                    @if($specialStatus == 1 || $specialStatus == 2 || $specialStatus == 3 || $specialStatus == 4)
+                        <li class="nav-item" role="presentation">
+                            <div id="navref3">
+                                <button class="nav-link" id="mytask-bus-tab" data-bs-toggle="tab"
+                                    data-bs-target="#mytask" type="button" role="tab"
+                                    aria-controls="contact-tab-pane" aria-selected="false">
+                                    <i class="fa-solid fa-exclamation fa-beat-fade"
+                                        style="--fa-beat-fade-opacity: 0.1; --fa-beat-fade-scale: 1.25;"></i>&nbsp;My Task
+                                </button>
+                            </div>
+                        </li>
+                    @endif
+
+                    <!-- Completed Task (Visible to Everyone) -->
                     <li class="nav-item" role="presentation">
                         <div id="navref4">
                             <button class="nav-link" id="comp-bus-tab" data-bs-toggle="tab"
                                 data-bs-target="#completed" type="button" role="tab"
-                                aria-controls="disabled-tab-pane" aria-selected="false"> <i
-                                    class="fa-solid fa-check fa-beat"
+                                aria-controls="disabled-tab-pane" aria-selected="false">
+                                <i class="fa-solid fa-check fa-beat"
                                     style="--fa-animation-duration: 1.5s;"></i>&nbsp;Completed Task
                             </button>
                         </div>
                     </li>
+
+                    <!-- History (Visible to Everyone) -->
                     <li class="nav-item" role="presentation">
                         <div id="navref5">
                             <button class="nav-link" id="rej-bus-tab" data-bs-toggle="tab"
                                 data-bs-target="#history" type="button" role="tab"
-                                aria-controls="disabled-tab-pane" aria-selected="false"> <i
-                                    class="fa-solid fa fa-history fa-spin"
+                                aria-controls="disabled-tab-pane" aria-selected="false">
+                                <i class="fa-solid fa fa-history fa-spin"
                                     style="--fa-flip-x: 1; --fa-flip-y: 0;"></i>&nbsp;History
                             </button>
                         </div>
@@ -1486,12 +1500,12 @@
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="home-tab"
                         tabindex="0">
-                        <div class="tab-pane p-3 active show" id="dashboard" role="tabpanel">
+                        <div class="p-3 tab-pane active show" id="dashboard" role="tabpanel">
                             <div class="card">
                                 <div class="card-body">
                                     <div id="dashref">
                                         <div class="row">
-                                            <div class="col-12 col-md-3 mb-3">
+                                            <div class="mb-3 col-12 col-md-3">
                                                 <div class="circle-card" style="background-color:rgb(252, 119, 71);">
                                                     <div class="text-center">
                                                         <i class="fas fa-bell fa-lg"></i>
@@ -1500,7 +1514,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-12 col-md-3 mb-3">
+                                            <div class="mb-3 col-12 col-md-3">
                                                 <div class="circle-card" style="background-color:rgb(241, 74, 74);">
                                                     <div class="text-center">
                                                         <i class="fa fa-tasks fa-lg"></i>
@@ -1509,7 +1523,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-12 col-md-3 mb-3">
+                                            <div class="mb-3 col-12 col-md-3">
                                                 <div class="circle-card" style="background-color:rgb(70, 160, 70);">
                                                     <div class="text-center">
                                                         <i class="fas fa-check fa-lg"></i>
@@ -1518,34 +1532,34 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-12 col-md-3 mb-3">
+                                            <div class="mb-3 col-12 col-md-3">
                                                 <div class="circle-card" style="background-color: rgb(187, 187, 35);">
                                                     <div class="text-center">
                                                         <i class="fas fa-exclamation fa-lg"></i>
                                                         <h1>{{$dashboard_overdueTasks}}</h1>
-                                                        <small>Over due task</small>
+                                                        <small>Overdue Tasks</small>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Marquee Container -->
+                                        </div> <!-- Row -->
+                                    </div> <!-- #dashref -->
+                                </div> <!-- Card Body -->
+                            </div> <!-- Card -->
+                        </div> <!-- Tab Pane -->
+                    </div> <!-- Dashboard -->
 
-                        </div>
-                    </div>
+
                     <!----------Assigned Table -------------------------------------------------------------->
                     <div class="tab-pane fade" id="assignedtask" role="tabpanel" aria-labelledby="contact-tab"
                         tabindex="0">
-                        <div class="d-flex justify-content-end mb-3">
+                        <div class="mb-3 d-flex justify-content-end">
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                 data-bs-target="#addtask">
                                 Add Task
                             </button>
                         </div>
                         <div class="custom-table table-responsive">
-                            <table class="table table-hover mb-0 " id="assignedtask1">
+                            <table class="table mb-0 table-hover " id="assignedtask1">
                                 <thead class="gradient-header">
                                     <tr>
                                         <th class="text-center">S No</th>
@@ -1600,11 +1614,11 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                                 </div>
-                  
+
                                 <div class="modal-body">
                                     <form id="addtaskform" enctype="multipart/form-data">
-                                    <input type="text" id="hidden_faculty_id" value="{{$facultyId}}" name="faculty_id">
-                                <input type="text" id="hidden_faculty_name" value="{{$facultyName}}" name="faculty_name">
+                                    <input type="hidden" id="hidden_faculty_id" value="{{$facultyId}}" name="faculty_id">
+                                <input type="hidden" id="hidden_faculty_name" value="{{$facultyName}}" name="faculty_name">
 
                                         <div class="mb-3">
                                             <label>Select Role:</label><br>
@@ -1704,7 +1718,7 @@
                             <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                                 <div class="custom-table table-responsive">
                                     <div class="custom-table table-responsive">
-                                        <table class="table table-hover mb-0 " id="mytask1">
+                                        <table class="table mb-0 table-hover " id="mytask1">
                                             <thead class="gradient-header">
                                                 <tr>
                                                     <th class="text-center">S.No</th>
@@ -1769,7 +1783,7 @@
                             </div>
                             <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
                                 <div class="custom-table table-responsive">
-                                    <table class="table table-hover mb-0 " id="mytask2">
+                                    <table class="table mb-0 table-hover " id="mytask2">
                                         <thead class="gradient-header">
                                             <tr>
                                                 <th class="text-center">S.No</th>
@@ -1807,7 +1821,7 @@
                             </div>
                             <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
                                 <div class="custom-table table-responsive">
-                                    <table class="table table-hover mb-0 " id="overdue1">
+                                    <table class="table mb-0 table-hover " id="overdue1">
                                         <thead class="gradient-header">
                                             <tr>
                                                 <th class="text-center">S.No</th>
@@ -2192,17 +2206,17 @@
             <!------------------------------- Faculty details modal ----------------------------------->
             <div class="modal fade" id="viewDetails" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
-                    <div class="modal-content shadow-lg rounded-3">
-                        <div class="modal-header bg-primary text-white">
+                    <div class="shadow-lg modal-content rounded-3">
+                        <div class="text-white modal-header bg-primary">
                             <h1 class="modal-title fs-5" id="exampleModalLabel">Faculty Details</h1>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <div class="d-flex justify-content-between mb-3 p-2 bg-light rounded " id="forwardfacultyDetailsHeader" style="color: #333; font-weight: bold;">
+                            <div class="p-2 mb-3 rounded d-flex justify-content-between bg-light " id="forwardfacultyDetailsHeader" style="color: #333; font-weight: bold;">
                             </div>
 
-                            <table class="table table-hover table-bordered text-center align-middle shadow-sm rounded">
-                                <thead class="bg-dark text-white">
+                            <table class="table text-center align-middle rounded shadow-sm table-hover table-bordered">
+                                <thead class="text-white bg-dark">
                                     <tr>
                                         <th scope="col">S No</th>
                                         <th scope="col">Faculty</th>
@@ -2233,18 +2247,18 @@
 
             <div class="modal fade" id="CviewDetails" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
-                    <div class="modal-content shadow-lg rounded-3">
-                        <div class="modal-header bg-primary text-white">
+                    <div class="shadow-lg modal-content rounded-3">
+                        <div class="text-white modal-header bg-primary">
                             <h1 class="modal-title fs-5" id="exampleModalLabel">Faculty Details</h1>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <div class="d-flex justify-content-between mb-3 p-3 rounded shadow-sm"
+                            <div class="p-3 mb-3 rounded shadow-sm d-flex justify-content-between"
                                 style=" color: #333; font-weight: bold;"
                                 id="cassignedDetailsHeader">
                             </div>
 
-                            <table class="table table-hover table-bordered text-center align-middle shadow rounded"
+                            <table class="table text-center align-middle rounded shadow table-hover table-bordered"
                                 style="border: 2px solidrgb(12, 113, 43);">
                                 <thead style="background: linear-gradient(135deg, #6a11cb, #2575fc); color: #fff;">
                                     <tr>
@@ -2259,7 +2273,7 @@
                             </table>
                         </div>
                         <div class="modal-footer d-flex justify-content-end">
-                            <button type="button" class="btn text-white fw-bold"
+                            <button type="button" class="text-white btn fw-bold"
                                 style="background: linear-gradient(135deg, #43cea2, #185a9d);"
                                 data-bs-dismiss="modal">Close</button>
                         </div>
@@ -2322,17 +2336,17 @@
 
             <div class="modal fade" id="forwardviewDetails" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
-                    <div class="modal-content shadow-lg rounded-3">
-                        <div class="modal-header bg-primary text-white">
+                    <div class="shadow-lg modal-content rounded-3">
+                        <div class="text-white modal-header bg-primary">
                             <h1 class="modal-title fs-5" id="exampleModalLabel">Faculty Details</h1>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <div class="d-flex justify-content-between mb-3 p-2 bg-light rounded " id="forwardassignedDetailsHeader">
+                            <div class="p-2 mb-3 rounded d-flex justify-content-between bg-light " id="forwardassignedDetailsHeader">
                             </div>
 
-                            <table class="table table-hover table-bordered text-center align-middle shadow-sm rounded">
-                                <thead class="bg-dark text-white">
+                            <table class="table text-center align-middle rounded shadow-sm table-hover table-bordered">
+                                <thead class="text-white bg-dark">
                                     <tr>
                                         <th scope="col">S No</th>
                                         <th scope="col">Faculty</th>
@@ -2806,7 +2820,7 @@
                 return selectedFaculties;
             }
             // forward task
-            //forwardtask 
+            //forwardtask
             // Forward Task Selection
             function toggleForwardTaskSelection() {
                 const type = document.getElementById('forwardtype').value;

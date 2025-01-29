@@ -30,10 +30,7 @@ class userController extends Controller
         ]);
 
         // Find the user in the Faculty model
-        $faculty = Faculty::join('specialrole', 'faculty.id', '=', 'specialrole.id')
-        ->where('faculty.id', $request->faculty_id) // Specify the table name for 'id'
-        ->select('faculty.id', 'faculty.role', 'faculty.name','faculty.pass', 'specialrole.Role')
-        ->first();
+        $faculty = Faculty::where('id', $request->faculty_id)->first();
         // Check if user exists and password matches
         if ($faculty && $faculty->pass === $request->password) {
             // Store    user information in session
@@ -76,7 +73,9 @@ class userController extends Controller
         $dashboard_assigned_task = Maintask::where('status', 0)
             ->where('assigned_by_id', $facultyId)
             ->count();
-        //My tasks queries
+
+            $specialStatus = Specialrole::where('id', '=', $facultyId)->value('Status');
+            //My tasks queries
         $my_det1 = Mainbranch::where('assigned_to_id', $facultyId)
             ->whereIn('status', ['0', '2'])
             ->whereNotExists(function ($query) {
@@ -254,7 +253,7 @@ class userController extends Controller
 
 
 
-        //finish tasks    
+        //finish tasks
         $tasks = Mainbranch::select('task_id')->get();
         // Render the index view with session and task data
 
@@ -367,7 +366,14 @@ class userController extends Controller
 
 
 
-        return view('index', compact('facultyId', 'facultyName', 'role', 'department', 'dept', 'deptfaculty', 'assigned_task', 'my_det1', 'my_det2', 'combinedTasks', 'forwarded_task', 'tasks', 'mainTasks', 'completed_my_task', 'completed_assigntask', 'overdueTasks', 'currentDate', 'disclaimertasks', 'dashboard_assigned_task', 'dashboardcombinedTasks', 'dashboard_completed_tasks', 'dashboard_overdueTasks'));
+        return view('index', compact('facultyId', 'facultyName', 'role',
+         'department', 'dept', 'deptfaculty',
+          'assigned_task', 'my_det1', 'my_det2',
+           'combinedTasks', 'forwarded_task', 'tasks',
+            'mainTasks', 'completed_my_task', 'completed_assigntask',
+             'overdueTasks', 'currentDate', 'disclaimertasks',
+              'dashboard_assigned_task', 'dashboardcombinedTasks',
+               'dashboard_completed_tasks', 'dashboard_overdueTasks','specialStatus'));
     }
 
     //Add task
