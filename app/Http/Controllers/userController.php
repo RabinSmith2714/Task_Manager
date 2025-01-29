@@ -9,6 +9,7 @@ use App\Models\Maintask;
 use App\Models\Department;
 use App\Models\Mainbranch;
 use App\Models\Subtask;
+use App\Models\Specialrole;
 use App\Models\Point;
 use Carbon\Carbon;
 use App\Mail\TaskAddedMail;
@@ -29,10 +30,10 @@ class userController extends Controller
         ]);
 
         // Find the user in the Faculty model
-        $faculty = Faculty::where('id', $request->faculty_id)
-            ->join('specialroles', 'faculty.id', '=', 'specialroles.id') // Joining Specialrole table
-            ->select('faculty.*', 'specialroles.*') // Selecting all faculty fields + Status from Specialrole
-            ->first();
+        $faculty = Faculty::join('specialrole', 'faculty.id', '=', 'specialrole.id')
+        ->where('faculty.id', $request->faculty_id) // Specify the table name for 'id'
+        ->select('faculty.id', 'faculty.role', 'faculty.name','faculty.pass', 'specialrole.Role')
+        ->first();
         // Check if user exists and password matches
         if ($faculty && $faculty->pass === $request->password) {
             // Store    user information in session
