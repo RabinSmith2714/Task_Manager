@@ -1744,21 +1744,13 @@
                                                     <td class="text-center">{{$my->title}}</td>
                                                     <td class="text-center">{{$my->description}}</td>
                                                     <td class="text-center">
-                                                        @if($my->status==2)
-                                                        <button type="button"
-                                                            class="btn btn-primary showImage"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#forwardModal"
-                                                            data-task-id="{{ $my->task_id }}"
-                                                            data-status="{{ $my->status }}"
-                                                            data-deadline="{{ $my->deadline }}" disabled> <!-- Add the deadline as a data attribute -->
-                                                            <i class="fas fa-share"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-success btncomplete"
-                                                            value="{{$my->task_id}}" disabled>
+                                                    @if($my->status==0)
+                                                        
+                                                        <button type="button" class="btn btn-success btnaccept"
+                                                            value="{{$my->task_id}}" >
                                                             <i class="fas fa-check"></i>
                                                         </button>
-                                                        @else
+                                                        @else if($my->status == 1)
                                                         <button type="button"
                                                             class="btn btn-primary showImage"
                                                             data-bs-toggle="modal"
@@ -1768,7 +1760,7 @@
                                                             data-deadline="{{ $my->deadline }}"> <!-- Add the deadline as a data attribute -->
                                                             <i class="fas fa-share"></i>
                                                         </button>
-                                                        <button type="button" class="btn btn-success btncomplete"
+                                                        <button type="button" class="btn btn-success btnaccept"
                                                             value="{{$my->task_id}}">
                                                             <i class="fas fa-check"></i>
                                                         </button><br>
@@ -3287,23 +3279,23 @@
             });
 
             //click to complete button in mytasks
-            $(document).on('click', '.btncomplete', function(e) {
+            $(document).on('click', '.btnaccept', function(e) {
                 e.preventDefault();
 
-                var completeId = $(this).val();
-                var completedDate = new Date().toISOString().split('T')[0];
-                console.log(completeId);
+                var acceptId = $(this).val();
+                
+                console.log(acceptId);
 
                 alertify.confirm(
                     'Confirmation',
-                    'Are you sure you want to complete this task?',
+                    'Are you sure you want to accept this task?',
                     function() {
                         $.ajax({
                             type: 'POST',
-                            url: `/user/complete/${completeId}`,
+                            url: `/user/accept/${acceptId}`,
                             data: {
-                                id: completeId,
-                                completed_date: completedDate,
+                                id: acceptId,
+                                
 
                             },
                             success: function(response) {
@@ -3315,7 +3307,7 @@
                                         console.log("Table reloaded successfully.");
 
                                     });
-                                    alertify.success('Task Completed successfully!');
+                                    alertify.success('Task Accepted successfully!');
                                 }
                             },
                             error: function(xhr, status, error) {
@@ -3325,10 +3317,11 @@
                         });
                     },
                     function() {
-                        alertify.error('Completion canceled');
+                        alertify.error('Acception canceled');
                     }
                 );
             });
+
 
 
 

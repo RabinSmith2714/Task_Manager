@@ -619,17 +619,17 @@ class userController extends Controller
         }
     }
 
-    public function completed(Request $request, $id)
+    public function accepted(Request $request, $id)
     {
         $facultyId = session('faculty_id');
         $ctask1 = Subtask::where('task_id', $id)->where('assigned_to_id', $facultyId)->update([
-            'status' => 2,
-            'completed_date' => $request->completed_date,
+            'status' => 1,
+            
         ]);
         if ($ctask1 === 0) {
             $ctask1 = Mainbranch::where('task_id', $id)->update([
-                'status' => 2,
-                'completed_date' => $request->completed_date,
+                'status' => 1,
+                
             ]);
         }
     }
