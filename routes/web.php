@@ -26,6 +26,8 @@ Route::post('/store-reason/{id}', [UserController::class, 'storeReason'])->name(
 //forwardtask
 Route::post('/forward/forwardtask', [userController::class, 'forwardtask']);
 //click to complete task
+Route::post('/user/complete/{id}',[userController::class, 'completed']);
+//click to accept
 Route::post('/user/accept/{id}',[userController::class, 'accepted']);
 //forward approve work
 Route::post('user/forwardapprove/{id}', [userController::class,"forwardapprove"]);

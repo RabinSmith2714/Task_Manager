@@ -1744,13 +1744,12 @@
                                                     <td class="text-center">{{$my->title}}</td>
                                                     <td class="text-center">{{$my->description}}</td>
                                                     <td class="text-center">
-                                                    @if($specialStatus == 3 && $my->status == 0)
-
+                                                    @if(($specialStatus == 3 && $my->status == 0) || ($specialStatus == 4 && $my->status == 0) || ($specialStatus === null))
                                                         <button type="button" class="btn btn-success btnaccept"
                                                             value="{{$my->task_id}}" >
                                                             <i class="fas fa-check"></i>
                                                         </button>
-                                                    @ifelse(($specialStatus == 1 && $my->status == 0) || ($specialStatus == 2 && $my->status == 0))
+                                                    @elseif(($specialStatus == 1 && $my->status == 0) || ($specialStatus == 2 && $my->status == 0))
                                                         <button type="button"
                                                             class="btn btn-primary showImage"
                                                             data-bs-toggle="modal"
@@ -1760,7 +1759,16 @@
                                                             data-deadline="{{ $my->deadline }}"> <!-- Add the deadline as a data attribute -->
                                                             <i class="fas fa-share"></i>
                                                         </button>
-
+                                                        @elseif(($specialStatus == 3 && $my->status == 1) || ($specialStatus == 4 && $my->status == 1) || ($specialStatus === null))
+                                                        <button type="button" class="btn btn-success btncomplete"
+                                                            value="{{$my->task_id}}"  >
+                                                            <i class="fas fa-circle"></i>
+                                                        </button>
+                                                        @elseif(($specialStatus == 3 && $my->status == 2) || ($specialStatus == 4 && $my->status == 2) || ($specialStatus === null))
+                                                        <button type="button" class="btn btn-secondary "
+                                                            value="{{$my->task_id}}" disabled >
+                                                            <i class="fas fa-circle"></i>
+                                                        </button>
 
                                                     @endif
                                                     <td class="text-center">{{\Carbon\Carbon::parse($my->deadline)->format('d-m-Y') }}</td>
@@ -3239,7 +3247,7 @@
                 });
             });
 
-            //click to complete button in mytasks
+            //click to accept button in mytasks
             $(document).on('click', '.btnaccept', function(e) {
                 e.preventDefault();
 
@@ -3283,6 +3291,49 @@
                 );
             });
 
+            //click to complete button in mytasks
+            $(document).on('click', '.btncomplete', function(e) {
+                e.preventDefault();
+
+                var completeId = $(this).val();
+                var completedDate = new Date().toISOString().split('T')[0];
+                console.log(completeId);
+
+                alertify.confirm(
+                    'Confirmation',
+                    'Are you sure you want to complete this task?',
+                    function() {
+                        $.ajax({
+                            type: 'POST',
+                            url: `/user/complete/${completeId}`,
+                            data: {
+                                id: completeId,
+                                completed_date: completedDate,
+
+                            },
+                            success: function(response) {
+                                if (response.status === 500) {
+                                    alertify.error(response.message);
+
+                                } else {
+                                    $('#mytask1').load(location.href + ' #mytask1', function() {
+                                        console.log("Table reloaded successfully.");
+
+                                    });
+                                    alertify.success('Task Completed successfully!');
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error approving the task:', error);
+                                alertify.error('An error occurred. Please try again.');
+                            }
+                        });
+                    },
+                    function() {
+                        alertify.error('Completion canceled');
+                    }
+                );
+            });
 
 
 

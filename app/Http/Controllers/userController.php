@@ -90,7 +90,7 @@ class userController extends Controller
 
             //My tasks queries
         $my_det1 = Mainbranch::where('assigned_to_id', $facultyId)
-            ->whereIn('status', ['0', '2'])
+            ->whereIn('status', ['0', '1','2'])
             ->whereNotExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('Subtask')
@@ -101,7 +101,7 @@ class userController extends Controller
             ->get();
 
         $my_det2 = Subtask::where('assigned_to_id', $facultyId)
-            ->whereIn('status', ['0', '2'])
+            ->whereIn('status', ['0', '1','2'])
             ->whereNotExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('Subtask as sub')
@@ -643,6 +643,20 @@ class userController extends Controller
             $ctask1 = Mainbranch::where('task_id', $id)->update([
                 'status' => 1,
 
+            ]);
+        }
+    }
+    public function completed(Request $request, $id)
+    {
+        $facultyId = session('faculty_id');
+        $ctask1 = Subtask::where('task_id', $id)->where('assigned_to_id', $facultyId)->update([
+            'status' => 2,
+            'completed_date' => $request->completed_date,
+        ]);
+        if ($ctask1 === 0) {
+            $ctask1 = Mainbranch::where('task_id', $id)->update([
+                'status' => 2,
+                'completed_date' => $request->completed_date,
             ]);
         }
     }
