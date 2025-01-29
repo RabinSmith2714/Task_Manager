@@ -1602,8 +1602,6 @@
                                 </div>
                                 <div class="modal-body">
                                     <form id="addtaskform" enctype="multipart/form-data">
-                                        <input type="hidden" id="hidden_faculty_id" value="{{$facultyId}}" name="faculty_id">
-                                        <input type="hidden" id="hidden_faculty_name" value="{{$facultyName}}" name="faculty_name">
                                         <div class="mb-3">
                                             <label>Select Role:</label><br>
                                             <select class="form-control" style="width: 100%; height:36px;" name="type" id="type" onchange="toggleSelection()">

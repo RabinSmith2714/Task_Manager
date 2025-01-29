@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\userController;
+use App\Http\Controllers\mainController;
 
 Route::get('/index', [userController::class,"index"]) -> name('index');
 
@@ -42,3 +43,9 @@ Route::post('/overdue/complete/{id}', [userController::class,"overduecomplete"])
 //History tab
 Route::get('/chart-data', [userController::class, 'getChartData']);
 Route::post('/get-demerit-points', [userController::class, 'getDemeritPoints'])->name('getDemeritPoints');
+
+
+//main  file
+Route::get('/main', [mainController::class,"main"]) -> name('main');
+//Add Roles
+Route::Post('add/role', [mainController::class, "addRole"]);

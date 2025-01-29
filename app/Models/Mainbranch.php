@@ -16,11 +16,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property int|null $task_id
  * @property int|null $assigned_to_id
  * @property string|null $assigned_to_name
- * @property int|null $status
  * @property Carbon|null $completed_date
+ * @property Carbon|null $deadline
  * @property string|null $reason
  * @property string|null $feedback
- * @property string|null $deadline
+ * @property int|null $status
+ * 
  * @property Maintask|null $maintask
  *
  * @package App\Models
@@ -33,20 +34,20 @@ class Mainbranch extends Model
 	protected $casts = [
 		'task_id' => 'int',
 		'assigned_to_id' => 'int',
-		'status' => 'int',
 		'completed_date' => 'datetime',
-		'deadline' => 'datetime'
+		'deadline' => 'datetime',
+		'status' => 'int'
 	];
 
 	protected $fillable = [
 		'task_id',
 		'assigned_to_id',
 		'assigned_to_name',
-		'status',
 		'completed_date',
-		'reason',
 		'deadline',
-		'feedback'
+		'reason',
+		'feedback',
+		'status'
 	];
 
 	public function maintask()

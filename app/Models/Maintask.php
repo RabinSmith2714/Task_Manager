@@ -19,10 +19,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property int|null $assigned_by_id
  * @property string|null $assigned_by_name
  * @property Carbon|null $assigned_date
- * @property Carbon|null $deadline
  * @property Carbon|null $completed_date
  * @property int|null $status
  * @property int|null $forward_count
+ * @property Carbon|null $deadline
  * 
  * @property Collection|Mainbranch[] $mainbranches
  * @property Collection|Point[] $points
@@ -39,10 +39,10 @@ class Maintask extends Model
 	protected $casts = [
 		'assigned_by_id' => 'int',
 		'assigned_date' => 'datetime',
-		'deadline' => 'datetime',
 		'completed_date' => 'datetime',
 		'status' => 'int',
-		'forward_count' => 'int'
+		'forward_count' => 'int',
+		'deadline' => 'datetime'
 	];
 
 	protected $fillable = [
@@ -51,10 +51,10 @@ class Maintask extends Model
 		'assigned_by_id',
 		'assigned_by_name',
 		'assigned_date',
-		'deadline',
 		'completed_date',
 		'status',
-		'forward_count'
+		'forward_count',
+		'deadline'
 	];
 
 	public function mainbranches()

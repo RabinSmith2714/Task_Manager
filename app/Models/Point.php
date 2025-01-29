@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Point extends Model
 {
-	protected $table = 'points';
+	protected $table = 'point';
 	protected $primaryKey = 'point_id';
 	public $timestamps = false;
 
