@@ -1456,6 +1456,7 @@
                     @endif
 
                     <!-- My Task (Only for Management Heads (1), Center Heads (2), HOD (3), Faculty (4)) -->
+                    @if($specialStatus == 1 || $specialStatus == 2 || $specialStatus == 3)
                         <li class="nav-item" role="presentation">
                             <div id="navref3">
                                 <button class="nav-link" id="mytask-bus-tab" data-bs-toggle="tab"
@@ -1466,7 +1467,7 @@
                                 </button>
                             </div>
                         </li>
-                 
+                    @endif
 
                     <!-- Completed Task (Visible to Everyone) -->
                     <li class="nav-item" role="presentation">
@@ -1709,7 +1710,7 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="work-bus-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Forwarded task</button>
                             </li>
-                           
+
                         </ul>
                         <div class="tab-content" id="myTabContent">
                             <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
@@ -1742,7 +1743,7 @@
                                                     <td class="text-center">{{$my->description}}</td>
                                                     <td class="text-center">
                                                     @if($specialStatus == 3 && $my->status == 0)
-                                                        
+
                                                         <button type="button" class="btn btn-success btnaccept"
                                                             value="{{$my->task_id}}" >
                                                             <i class="fas fa-check"></i>
@@ -1757,8 +1758,8 @@
                                                             data-deadline="{{ $my->deadline }}"> <!-- Add the deadline as a data attribute -->
                                                             <i class="fas fa-share"></i>
                                                         </button>
-                                                    
-                                                        
+
+
                                                     @endif
                                                     <td class="text-center">{{\Carbon\Carbon::parse($my->deadline)->format('d-m-Y') }}</td>
                                                 </tr>
@@ -1806,7 +1807,7 @@
                                     </table>
                                 </div>
                             </div>
-                            
+
                         </div>
                     </div>
                     <!----------------------- My Task Ends ------------------------------------->
@@ -3241,7 +3242,7 @@
                 e.preventDefault();
 
                 var acceptId = $(this).val();
-                
+
                 console.log(acceptId);
 
                 alertify.confirm(
@@ -3253,7 +3254,7 @@
                             url: `/user/accept/${acceptId}`,
                             data: {
                                 id: acceptId,
-                                
+
 
                             },
                             success: function(response) {

@@ -74,7 +74,21 @@ class userController extends Controller
             ->where('assigned_by_id', $facultyId)
             ->count();
 
-            $specialStatus = Specialrole::where('id', '=', $facultyId)->value('Status');
+            $specialStatus = Specialrole::where('id', $facultyId)->value('Status');
+
+            $specialStatus = Specialrole::where('id', $facultyId)->value('Status');
+
+            if (is_null($specialStatus)) {
+                // Check in the faculty table where status is 1 and role is 'faculty'
+                $faculty = Faculty::where('id', $facultyId)
+                                  ->where('status', 1)
+                                  ->where('role', 'faculty')
+                                  ->first();
+
+                $specialStatus = $faculty ? 1 : null; // Assign 1 only if faculty exists with role 'faculty'
+            }
+
+
             //My tasks queries
         $my_det1 = Mainbranch::where('assigned_to_id', $facultyId)
             ->whereIn('status', ['0', '2'])
@@ -117,7 +131,7 @@ class userController extends Controller
 
 
             ->select('Maintask.title', 'Maintask.description', 'Maintask.assigned_by_name', 'Maintask.deadline', 'Maintask.task_id', 'Mainbranch.status')
-            
+
             ->get();
 
         // Combine results
@@ -624,12 +638,12 @@ class userController extends Controller
         $facultyId = session('faculty_id');
         $ctask1 = Subtask::where('task_id', $id)->where('assigned_to_id', $facultyId)->update([
             'status' => 1,
-            
+
         ]);
         if ($ctask1 === 0) {
             $ctask1 = Mainbranch::where('task_id', $id)->update([
                 'status' => 1,
-                
+
             ]);
         }
     }
