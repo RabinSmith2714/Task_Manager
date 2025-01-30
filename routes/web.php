@@ -51,3 +51,7 @@ Route::post('/get-demerit-points', [userController::class, 'getDemeritPoints'])-
 Route::get('/main', [mainController::class,"main"]) -> name('main');
 //Add Roles
 Route::Post('add/role', [mainController::class, "addRole"]);
+//reassign
+Route::post('/store-reassign', [UserController::class, 'storeReassign']);
+Route::post('/store-reassignforward', [UserController::class, 'storeReassignforward']);
+Route::post('/tasks/update-status/{id}', [UserController::class, 'ReassignDate']);

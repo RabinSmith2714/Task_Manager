@@ -22,6 +22,7 @@ class userController extends Controller
     {
         return view('login');
     }
+
     public function authenticate(Request $request)
     {
         $request->validate([
@@ -31,26 +32,20 @@ class userController extends Controller
 
         // Find the user in the Faculty model
         $faculty = Faculty::where('id', $request->faculty_id)->first();
-        // Check if user exists and password matches
         if ($faculty && $faculty->pass === $request->password) {
-            // Store    user information in session
             session([
                 'faculty_id' => $faculty->id,
                 'role' => $faculty->role,
                 'faculty_name' => $faculty->name,
                 'department' => $faculty->dept,
-                'roleStatus' => $faculty->Status,
-                'rolename'=> $faculty->Role,
             ]);
 
-            // Return JSON success response for AJAX
             return response()->json([
                 'status' => 'success',
                 'message' => 'Login successful!',
                 'redirect_url' => route('index'),
             ]);
         } else {
-            // Return JSON error response for AJAX
             return response()->json([
                 'status' => 'error',
                 'message' => 'Invalid login credentials!',
@@ -71,24 +66,19 @@ class userController extends Controller
         $deptfaculty = Faculty::where('status', '1')->where('id', '!=', $facultyId)->get();
         $assigned_task = Maintask::select('task_id', 'title', 'description', 'deadline')->where('status', 0)->where('assigned_by_id', $facultyId)->groupBy('task_id', 'title', 'description', 'deadline')->get();
         $dashboard_assigned_task = Maintask::where('status', 0)
-            ->where('assigned_by_id', $facultyId)
-            ->count();
+                                            ->where('assigned_by_id', $facultyId)
+                                            ->count();
 
-             // Check if the user exists in the Specialrole table
-    $specialStatus = Specialrole::where('id', $facultyId)->value('Status');
+        //Special Role
+        $specialStatus = Specialrole::where('id', $facultyId)->value('Status');
+        if (is_null($specialStatus)) {
+            $faculty = Faculty::where('id', $facultyId)
+                            ->where('role', 'faculty')
+                            ->first();
+            $specialStatus = $faculty ? 4 : null;
+        }
 
-    // If not found in Specialrole, check Faculty table
-    if (is_null($specialStatus)) {
-        $faculty = Faculty::where('id', $facultyId)
-                          ->where('role', 'faculty')
-                          ->first();
-
-        // If found in Faculty, assign status 4 (Faculty)
-        $specialStatus = $faculty ? 4 : null;
-    }
-
-
-            //My tasks queries
+        //My tasks queries
         $my_det1 = Mainbranch::where('assigned_to_id', $facultyId)
             ->whereIn('status', ['0', '1','2'])
             ->whereNotExists(function ($query) {
@@ -620,6 +610,7 @@ class userController extends Controller
             $reasonEntry = Mainbranch::where('id', $id)->update([
                 'reason' => $request->reason,
                 'status' => 0,
+                'completed_date' => null
             ]);
 
             if ($reasonEntry) {
@@ -790,6 +781,9 @@ class userController extends Controller
         }
     }
     // History Tab
+
+
+    
     public function getChartData(Request $request)
     {
         // Validate request input
@@ -955,5 +949,52 @@ class userController extends Controller
 
         // Return the total demerit points
         return response()->json(['demerit_points' => $totalDemeritPoints]);
+    }
+    public function storeReassign(request $request){
+        $reassign = Mainbranch::find($request->task_id);
+        if ($reassign) {
+            $reassign->assigned_to_id = $request->faculty_id;
+            $reassign->assigned_to_name= $request->name;
+            $reassign->status = '0'; 
+            $reassign->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Task reassigned successfully!'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Task not found!'
+            ]);
+        }
+    }
+    public function storeReassignforward(request $request){
+        $reassign = Subtask::find($request->task_id);
+        if ($reassign) {
+            $reassign->assigned_to_id = $request->ffaculty_id;
+            $reassign->assigned_to_name= $request->fname;
+            $reassign->status = '0'; 
+            $reassign->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Task reassigned successfully!'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Task not found!'
+            ]);
+        }
+    }
+    public function ReassignDate(request $request,$id){
+        $Redate=Mainbranch::findorFail($id);
+        $task =$request->status;
+        if($task->status=='0'){
+         $task->status='1';
+         $task->save();
+        }
+
     }
 }
