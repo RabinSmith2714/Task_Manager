@@ -90,7 +90,7 @@
                     </li>
 
                     <!-- Assigned Task (Only for Principal (0), Management Heads (1), HOD (3)) -->
-                    @if($specialStatus == 0 || $specialStatus == 1 || $specialStatus == 3)
+                    @if($specialStatus == 0 || $specialStatus == 1 || $specialStatus == 3 )
                     <li class="nav-item" role="presentation">
                         <div id="navref2">
                             <button class="nav-link" id="pend-bus-tab" data-bs-toggle="tab"
@@ -103,7 +103,7 @@
                     @endif
 
                     <!-- My Task (Only for Management Heads (1), Center Heads (2), HOD (3), Faculty (4)) -->
-                    @if($specialStatus == 1 || $specialStatus == 2 || $specialStatus == 3 || $specialStatus == 4)
+                    @if($specialStatus == 1 || $specialStatus == 2 || $specialStatus == 3 || $specialStatus == 4 )
                     <li class="nav-item" role="presentation">
                         <div id="navref3">
                             <button class="nav-link" id="mytask-bus-tab" data-bs-toggle="tab" data-bs-target="#mytask"
@@ -343,12 +343,16 @@
                     <div class="tab-pane fade" id="mytask" role="tabpanel" aria-labelledby="contact-tab"
                         tabindex="0">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            @if($specialStatus == 1 || $specialStatus == 2 || $specialStatus == 3 || $specialStatus == 4 )
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="work-bus-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">My task</button>
                             </li>
+                            @endif
+                            @if($specialStatus == 3 || $specialStatus == 1||$specialStatus == 2)
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="work-bus-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Forwarded task</button>
                             </li>
+                            @endif
                         </ul>
                         <div class="tab-content" id="myTabContent">
                             <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
@@ -372,6 +376,7 @@
                                                 @php
                                                 $task_Deadline = \Carbon\Carbon::parse($my->deadline)->startOfDay();
                                                 $isToday = $task_Deadline->equalTo($currentDate);
+                                                $reasonExist = !is_null($my->reason);
                                                 @endphp
                                                 <tr class="{{ $isToday ? 'table-warning' : ''}}">
                                                     <td class="text-center">{{$sno++}}</td>
@@ -406,7 +411,15 @@
                                                             <i class="fas fa-circle"></i>
                                                         </button>
 
+
                                                         @endif
+                                                                <!-- Hide the button if reason does not exist -->
+                                                        @if($reasonExist)
+                                                        <button type="button" class="btn btn-secondary btnmyreason" value="{{$my->task_id}}">
+                                                            <i class="fas fa-light fa-message"></i>
+                                                        </button>
+                                                        @endif
+
                                                     <td class="text-center">{{\Carbon\Carbon::parse($my->deadline)->format('d-m-Y') }}</td>
                                                 </tr>
                                                 @endforeach
@@ -541,16 +554,22 @@
                     </div>
 
                     <!----------------------------Completed Task starts ---------------------------------------------------->
+
                     <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="disabled-tab"
                         tabindex="0">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            @if($specialStatus == 4 || $specialStatus == 5 )
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="completed-bus-tab" data-bs-toggle="tab" data-bs-target="#homeu-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">My tasks</button>
                             </li>
+                            @endif
+                            @if($specialStatus == 3 || $specialStatus == 0 || $specialStatus == 1  ||$specialStatus == 2)
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="completed-bus-tab" data-bs-toggle="tab" data-bs-target="#profileu-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Assigned task</button>
+                                <button class="nav-link " id="completed-bus-tab" data-bs-toggle="tab" data-bs-target="#profileu-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Assigned task</button>
                             </li>
+                            @endif
                         </ul>
+
                         <div class="tab-content" id="myTabContent">
                             <div class="tab-pane fade show active" id="homeu-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                                 <div class="custom-table table-responsive">
@@ -975,6 +994,7 @@
                     </div>
                 </div>
             </div>
+<<<<<<< HEAD
             {{-- extend deadline modal --}}
             <div class="modal fade" id="extendDeadlineModal" tabindex="-1" aria-labelledby="extendDeadlineLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
                 <div class="modal-dialog">
@@ -1005,6 +1025,28 @@
                                 </div>
                             </form>
                         </div>
+=======
+            {{-- REASON DISPLAY MODAL--}}
+            <div class="modal fade" id="reasonDisplayModal" tabindex="-1" aria-labelledby="reasonfModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="reasonfModalLabel">Reason</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="fredoreasonForm">
+                                <input type="hidden" id="forwardtaskId" name="task_id">
+                                <div class="mb-3">
+                                    <label for="fredoreasonText" class="form-label">Reason</label>
+                                    <label class="form-control" id="reasonDisplayText" rows="3" required></label>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+>>>>>>> 706292d3b49543a0d9e8b16c0f04bd1b34536c16
                     </div>
                 </div>
             </div>
@@ -1786,6 +1828,7 @@
             });
 
             // Function to fetch task details
+<<<<<<< HEAD
             // Function to fetch task details
 function handleTaskDetails(taskId) {
     $.ajax({
@@ -1797,6 +1840,19 @@ function handleTaskDetails(taskId) {
                 let updata = response.updata;
                 let deadline = updata[0].deadline.split("T")[0];
                 let assigned_date = updata[0].assigned_date.split("T")[0];
+=======
+            function handleTaskDetails(taskId) {
+                $.ajax({
+                    type: 'POST',
+                    url: `user/fetchdet/${taskId}`,
+                    success: function(response) {
+                        if (response.status === 200 && response.data.length > 0) {
+                            let taskDetails = '';
+                            let updata = response.updata;
+                            let reasons = response.reason;
+                            let deadline = updata[0].deadline.split("T")[0];
+                            let assigned_date = updata[0].assigned_date.split("T")[0];
+>>>>>>> 706292d3b49543a0d9e8b16c0f04bd1b34536c16
 
                 $('#forwardfacultyDetailsHeader').html(`
                     <div class="deadline-header">
@@ -1819,6 +1875,7 @@ function handleTaskDetails(taskId) {
                         new Date(task.completed_date).toLocaleDateString('en-GB') :
                         'N/A';
 
+<<<<<<< HEAD
                     taskDetails += `
                         <tr>
                             <td>${index + 1}</td>
@@ -1861,6 +1918,66 @@ function handleTaskDetails(taskId) {
                                 console.log(`Task ${task.id} status updated to 1 due to time limit.`);
                             }
                         });
+=======
+                                let formattedCompletedDate = task.completed_date ?
+                                    new Date(task.completed_date).toLocaleDateString('en-GB') :
+                                    'N/A';
+                                let hasReason = reasons.some(reason => reason.task_id === task.id);
+                                let reasonExist = task.reason !== null && task.status === 0;
+
+                                taskDetails += `
+                                    <tr>
+                                        <td>${index + 1}</td>
+                                        <td>${task.assigned_to_name}</td>
+                                        <td>
+                                            <span class="badge ${task.status === 3 ? 'bg-success' : 'bg-secondary'}">
+                                                ${task.status === 0 ? 'Submitted' :
+                                                task.status === 2 ? 'Completed' :
+                                                task.status === 3 ? 'Approved' : 'Unknown'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-success btnapprove" value="${task.id}" title="Approve Task" ${task.status === 3 || task.status === 0 ? 'disabled' : ''}>
+                                                <i class="fas fa-circle-check"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-danger btnredo" value="${task.id}" title="Redo Task" ${task.status === 3 || task.status === 0 ? 'disabled' : ''}>
+                                                <i class="fas fa-arrows-rotate"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-primary btnreassign" data-id="${task.id}"value ="${task.id}" data-status="${task.status}" title="Reassign Task" ${isDisabled ? 'disabled' : ''}>
+                                                <i class="fa-solid fa-arrows-turn-to-dots"></i>
+                                            </button>
+                                             ${reasonExist ? `
+            <button type="button" class="btn btn-secondary btnreason" data-id="${task.id}" value="${task.id}" data-status="${task.status}" title="Reason">
+                <i class="fas fa-light fa-message"></i>
+            </button>` : ''}
+
+                                        </td>
+                                        <td>${formattedCompletedDate}</td>
+                                    </tr>`;
+                                // If the button should be disabled, update the database
+                                if (isDisabled) {
+                                    $.ajax({
+                                        url: `/tasks/update-status/${task.id}`,
+                                        type: "POST",
+                                        data: {
+                                            _token: csrfToken,
+                                            status: status,
+                                        },
+                                        success: function(response) {
+                                            console.log(`Task ${task.id} status updated to 1`);
+                                        }
+                                    });
+                                }
+                            });
+                            $('#taskDetails').html(taskDetails); // Populate table
+                        } else {
+                            alert(response.message || 'No task details found.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching task details:', error);
+                        alertify.error('An error occurred while fetching task details. Please try again.');
+>>>>>>> 706292d3b49543a0d9e8b16c0f04bd1b34536c16
                     }
                 });
 
@@ -2484,6 +2601,7 @@ function handleTaskDetails(taskId) {
                     }
                 });
             });
+<<<<<<< HEAD
             // $(document).on('click', '.btnedeadline', function(e) {
             //     e.preventDefault();
             //     var taskId = $(this).val();
@@ -2554,10 +2672,75 @@ if (newDateOnly > oldDateOnly) {
         error: function (xhr) {
             alert("Error: " + xhr.responseJSON.error);
         },
+=======
+            //Reason display for assigned tab
+            $(document).on('click', '.btnreason', function () {
+                let taskId = $(this).data('id'); // Get task ID from button
+
+                $.ajax({
+                    type: 'POST',
+                    url: `/user/fetchdet/${taskId}`, // Fetch reason from backend
+                    success: function (response) {
+                        if (response.status === 200 && response.reason.length > 0) {
+                            let reasonText = response.reason[0].reason; // Get first reason
+
+                            $('#reasonDisplayText').text(reasonText); // Display reason in modal
+                            $('#forwardtaskId').val(taskId); // Set hidden input value
+
+                            $('#reasonDisplayModal').modal('show'); // Open modal
+                        } else {
+                            alertify.error('No reason found for this task.');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error fetching reason:', error);
+                        alertify.error('An error occurred while fetching the reason.');
+                    }
+                });
+            });
+
+            //Reason for mytask tab
+            $(document).on('click', '.btnmyreason', function() {
+    var taskId = $(this).val();  // Get task_id from button value
+
+    // Make an AJAX request to fetch the reason
+    $.ajax({
+        url: '/fetch-reason/' + taskId,  // The route to fetch reason
+        type: 'GET',
+        success: function(response) {
+            // Check if the task exists
+            if (response.tasks.length > 0) {
+                var reasonText = '';
+                // Loop through the tasks and find the reason
+                response.tasks.forEach(function(task) {
+                    if (task.task_id == taskId) {
+                        reasonText = task.reason;
+                    }
+                });
+
+                // Populate the modal with the reason
+                $('#reasonDisplayText').text(reasonText);
+                $('#task_id').val(taskId); // Set the task_id in the hidden input field
+
+                // Open the modal
+                $('#reasonDisplayModal').modal('show');
+            } else {
+                alert('No reason found for this task.');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("There was an error fetching the reason: ", error);
+            alert('Unable to fetch the reason. Please try again.');
+        }
+>>>>>>> 706292d3b49543a0d9e8b16c0f04bd1b34536c16
     });
 });
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 706292d3b49543a0d9e8b16c0f04bd1b34536c16
         </script>
 </body>
 

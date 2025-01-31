@@ -55,7 +55,14 @@ Route::Post('add/role', [mainController::class, "addRole"]);
 Route::post('/store-reassign', [UserController::class, 'storeReassign']);
 Route::post('/store-reassignforward', [UserController::class, 'storeReassignforward']);
 Route::post('/tasks/update-status/{id}', [UserController::class, 'ReassignDate']);
+<<<<<<< HEAD
 //extend dealine
 Route::get('/task/{id}', [UserController::class, 'getedeadline']);
 Route::post('/update-deadline', [UserController::class, 'updateDeadline']);
 
+=======
+// Reason for assigned tab
+Route::post('/user/fetchdet/{id}', [UserController::class, 'fetchdet']);
+// Reason for mytab
+Route::get('/fetch-reason/{id}', [userController::class, 'MyReason'])->name('fetch.reason');
+>>>>>>> 706292d3b49543a0d9e8b16c0f04bd1b34536c16

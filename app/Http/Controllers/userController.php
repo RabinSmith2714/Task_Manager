@@ -65,20 +65,32 @@ class userController extends Controller
         $deptfaculty = Faculty::where('status', '1')->where('id', '!=', $facultyId)->get();
         $assigned_task = Maintask::select('task_id', 'title', 'description', 'deadline')->where('status', 0)->where('assigned_by_id', $facultyId)->groupBy('task_id', 'title', 'description', 'deadline')->get();
         $dashboard_assigned_task = Maintask::where('status', 0)
+<<<<<<< HEAD
                                             ->where('assigned_by_id', $facultyId)
                                             ->count();
+=======
+            ->where('assigned_by_id', $facultyId)
+            ->count();
+
+>>>>>>> 706292d3b49543a0d9e8b16c0f04bd1b34536c16
         //Special Role
         $specialStatus = Specialrole::where('id', $facultyId)->value('Status');
         if (is_null($specialStatus)) {
             $faculty = Faculty::where('id', $facultyId)
-                            ->where('role', 'faculty')
-                            ->first();
+                ->where('role', 'faculty')
+                ->first();
             $specialStatus = $faculty ? 4 : null;
+        }
+        if (is_null($specialStatus)) {
+            $hod = Faculty::where('id', $facultyId)
+                ->where('role', 'HOD')
+                ->first();
+            $specialStatus = $hod ? 1 : null;
         }
 
         //My tasks queries
         $my_det1 = Mainbranch::where('assigned_to_id', $facultyId)
-            ->whereIn('status', ['0', '1','2'])
+            ->whereIn('status', ['0', '1', '2'])
             ->whereNotExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('Subtask')
@@ -89,7 +101,7 @@ class userController extends Controller
             ->get();
 
         $my_det2 = Subtask::where('assigned_to_id', $facultyId)
-            ->whereIn('status', ['0', '1','2'])
+            ->whereIn('status', ['0', '1', '2'])
             ->whereNotExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('Subtask as sub')
@@ -110,13 +122,20 @@ class userController extends Controller
                 'subtask.assigned_by_name',
                 'subtask.deadline',
                 'subtask.task_id',
-                'subtask.status'
+                'subtask.status',
+                'subtask.reason'
             )->get();
 
         // Fetch main tasks
+<<<<<<< HEAD
         $mainTasks = Maintask::whereIn('Maintask.task_id', $my_det1)->join('Mainbranch', 'Mainbranch.task_id', '=', 'Maintask.task_id')
             ->where('Mainbranch.assigned_to_id', $facultyId)
             ->select('Maintask.title', 'Maintask.description', 'Maintask.assigned_by_name', 'Mainbranch.deadline', 'Maintask.task_id', 'Mainbranch.status')
+=======
+        $mainTasks = Maintask::whereIn('Maintask.task_id', $my_det1)
+            ->join('Mainbranch', 'Mainbranch.task_id', '=', 'Maintask.task_id')
+            ->select('Maintask.title', 'Maintask.description', 'Maintask.assigned_by_name', 'Maintask.deadline', 'Maintask.task_id', 'Mainbranch.status', 'Mainbranch.reason')
+>>>>>>> 706292d3b49543a0d9e8b16c0f04bd1b34536c16
             ->get();
         // Combine results
         $combinedTasks = $mainTasks->concat($subTasks);
@@ -354,14 +373,31 @@ class userController extends Controller
 
 
 
-        return view('index', compact('facultyId', 'facultyName', 'role',
-         'department', 'dept', 'deptfaculty',
-          'assigned_task', 'my_det1', 'my_det2',
-           'combinedTasks', 'forwarded_task', 'tasks',
-            'mainTasks', 'completed_my_task', 'completed_assigntask',
-             'overdueTasks', 'currentDate', 'disclaimertasks',
-              'dashboard_assigned_task', 'dashboardcombinedTasks',
-               'dashboard_completed_tasks', 'dashboard_overdueTasks','specialStatus'));
+        return view('index', compact(
+            'facultyId',
+            'facultyName',
+            'role',
+            'department',
+            'dept',
+            'deptfaculty',
+            'assigned_task',
+            'my_det1',
+            'my_det2',
+            'combinedTasks',
+            'forwarded_task',
+            'tasks',
+            'mainTasks',
+            'completed_my_task',
+            'completed_assigntask',
+            'overdueTasks',
+            'currentDate',
+            'disclaimertasks',
+            'dashboard_assigned_task',
+            'dashboardcombinedTasks',
+            'dashboard_completed_tasks',
+            'dashboard_overdueTasks',
+            'specialStatus'
+        ));
     }
 
     //Add task
@@ -540,12 +576,17 @@ class userController extends Controller
     {
         $tasks = Mainbranch::where('task_id', $id)->get(); // Get the tasks related to the given id
         $uptasks = Maintask::where('task_id', $id)->get();
+        $reas = Mainbranch::where('task_id', $id)
+            ->where('status', '0')
+            ->whereNotNull('reason')
+            ->get();
 
 
         return response()->json([
             'status' => 200,
             'data' => $tasks,
-            'updata' => $uptasks
+            'updata' => $uptasks,
+            'reason' => $reas
         ]);
     }
 
@@ -768,7 +809,7 @@ class userController extends Controller
     // History Tab
 
 
-    
+
     public function getChartData(Request $request)
     {
         // Validate request input
@@ -935,12 +976,13 @@ class userController extends Controller
         // Return the total demerit points
         return response()->json(['demerit_points' => $totalDemeritPoints]);
     }
-    public function storeReassign(request $request){
+    public function storeReassign(request $request)
+    {
         $reassign = Mainbranch::find($request->task_id);
         if ($reassign) {
             $reassign->assigned_to_id = $request->faculty_id;
-            $reassign->assigned_to_name= $request->name;
-            $reassign->status = '0'; 
+            $reassign->assigned_to_name = $request->name;
+            $reassign->status = '0';
             $reassign->save();
 
             return response()->json([
@@ -954,12 +996,13 @@ class userController extends Controller
             ]);
         }
     }
-    public function storeReassignforward(request $request){
+    public function storeReassignforward(request $request)
+    {
         $reassign = Subtask::find($request->task_id);
         if ($reassign) {
             $reassign->assigned_to_id = $request->ffaculty_id;
-            $reassign->assigned_to_name= $request->fname;
-            $reassign->status = '0'; 
+            $reassign->assigned_to_name = $request->fname;
+            $reassign->status = '0';
             $reassign->save();
 
             return response()->json([
@@ -973,15 +1016,25 @@ class userController extends Controller
             ]);
         }
     }
+<<<<<<< HEAD
     public function ReassignDate(request $request,$id){
         $Redate=Mainbranch::findorFail($id);
         // $task =$request->status;
         if($task->status=='0'){
          $task->status='1';
          $task->save();
+=======
+    public function ReassignDate(request $request, $id)
+    {
+        $Redate = Mainbranch::findorFail($id);
+        $task = $request->status;
+        if ($task->status == '0') {
+            $task->status = '1';
+            $task->save();
+>>>>>>> 706292d3b49543a0d9e8b16c0f04bd1b34536c16
         }
-
     }
+<<<<<<< HEAD
     public function getedeadline($id) {
         $details = Mainbranch::where('id', $id)->first(); // Fetch the record
     
@@ -1011,4 +1064,57 @@ class userController extends Controller
         return response()->json(['success' => true]);
     }
     
+=======
+    public function MyReason($id)
+{
+    $facultyId = session('faculty_id');
+
+    // Fetch task IDs from Mainbranch
+    $my_det1 = Mainbranch::where('assigned_to_id', $facultyId)
+        ->whereIn('status', ['0', '1', '2'])
+        ->whereNotExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('Subtask')
+                ->whereColumn('Subtask.task_id', 'Mainbranch.task_id')
+                ->whereColumn('Subtask.assigned_by_id', 'Mainbranch.assigned_to_id');
+        })
+        ->select('task_id')
+        ->get();
+
+    // Fetch task IDs from Subtask
+    $my_det2 = Subtask::where('assigned_to_id', $facultyId)
+        ->whereIn('status', ['0', '1', '2'])
+        ->whereNotExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('Subtask as sub')
+                ->whereColumn('sub.task_id', 'Subtask.task_id')
+                ->whereColumn('sub.assigned_by_id', 'Subtask.assigned_to_id')
+                ->whereColumn('sub.sid', '<>', 'Subtask.sid'); // Ensures no self-check
+        })
+        ->select('task_id')
+        ->get();
+
+    // Query sub tasks and join with main tasks to fetch task_id and reason
+    $subTasks = Subtask::whereIn('subtask.task_id', $my_det2)
+        ->where('assigned_to_id', $facultyId)
+        ->join('maintask', 'subtask.task_id', '=', 'maintask.task_id')
+        ->select('subtask.task_id', 'subtask.reason')
+        ->get();
+
+    // Fetch main tasks and their reasons
+    $mainTasks = Maintask::whereIn('Maintask.task_id', $my_det1)
+        ->join('Mainbranch', 'Mainbranch.task_id', '=', 'Maintask.task_id')
+        ->select('Maintask.task_id', 'Mainbranch.reason')
+        ->get();
+
+    // Combine the main tasks and sub tasks results
+    $combinedTasks = $mainTasks->merge($subTasks);
+
+    // Return the combined tasks as a JSON response
+    return response()->json([
+        'tasks' => $combinedTasks
+    ]);
+}
+
+>>>>>>> 706292d3b49543a0d9e8b16c0f04bd1b34536c16
 }
