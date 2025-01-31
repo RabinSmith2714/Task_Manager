@@ -55,3 +55,7 @@ Route::Post('add/role', [mainController::class, "addRole"]);
 Route::post('/store-reassign', [UserController::class, 'storeReassign']);
 Route::post('/store-reassignforward', [UserController::class, 'storeReassignforward']);
 Route::post('/tasks/update-status/{id}', [UserController::class, 'ReassignDate']);
+// Reason for assigned tab
+Route::post('/user/fetchdet/{id}', [UserController::class, 'fetchdet']);
+// Reason for mytab
+Route::get('/fetch-reason/{id}', [userController::class, 'MyReason'])->name('fetch.reason');
