@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int|null $assigned_to_id
  * @property string|null $assigned_to_name
  * @property Carbon|null $completed_date
+ * @property Carbon|null $assigned_date
  * @property Carbon|null $deadline
  * @property string|null $reason
  * @property string|null $feedback
@@ -35,6 +36,7 @@ class Mainbranch extends Model
 		'task_id' => 'int',
 		'assigned_to_id' => 'int',
 		'completed_date' => 'datetime',
+		'assigned_date' => 'datetime',
 		'deadline' => 'datetime',
 		'status' => 'int'
 	];
@@ -43,6 +45,7 @@ class Mainbranch extends Model
 		'task_id',
 		'assigned_to_id',
 		'assigned_to_name',
+		'assigned_date',
 		'completed_date',
 		'deadline',
 		'reason',

@@ -55,3 +55,7 @@ Route::Post('add/role', [mainController::class, "addRole"]);
 Route::post('/store-reassign', [UserController::class, 'storeReassign']);
 Route::post('/store-reassignforward', [UserController::class, 'storeReassignforward']);
 Route::post('/tasks/update-status/{id}', [UserController::class, 'ReassignDate']);
+//extend dealine
+Route::get('/task/{id}', [UserController::class, 'getedeadline']);
+Route::post('/update-deadline', [UserController::class, 'updateDeadline']);
+

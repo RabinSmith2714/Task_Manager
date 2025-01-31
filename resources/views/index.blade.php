@@ -975,6 +975,39 @@
                     </div>
                 </div>
             </div>
+            {{-- extend deadline modal --}}
+            <div class="modal fade" id="extendDeadlineModal" tabindex="-1" aria-labelledby="extendDeadlineLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="extendDeadlineLabel">Extend Deadline</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="extendDeadlineForm">
+                                <input type="hidden" id="extenddeadlinetaskId" name="task_id">
+                                <div class="mb-3">
+                                    <label for="reason" class="form-label">Reason for Extension</label>
+                                    <input type="text" class="form-control" id="reason" name="reason" required disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="oldDeadline" class="form-label">Current Deadline</label>
+                                    <input type="text" class="form-control" id="oldDeadline" name="oldDeadline" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newDeadline" class="form-label">Extend Deadline</label>
+                                    <input type="date" class="form-control" id="newDeadline" name="newDeadline">
+                                </div>
+                                <input type="hidden" id="taskId" name="taskId">
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-------------------- Footer -------------------------------->
             <footer class="footer">
@@ -1478,7 +1511,6 @@
                 const selectedDepartments = [...document.querySelectorAll('input[name="faculty-dname[]"]:checked')].map(cb => cb.value);
                 const facultyDropdown = document.getElementById('departments-faculty-dropdown');
                 facultyDropdown.innerHTML = ''; // Clear existing options
-
                 // Add the "Select All" checkbox label
                 const selectAllLabel = document.createElement('label');
                 const selectAllCheckbox = document.createElement('input');
@@ -1754,89 +1786,95 @@
             });
 
             // Function to fetch task details
-            function handleTaskDetails(taskId) {
-                $.ajax({
-                    type: 'POST',
-                    url: `user/fetchdet/${taskId}`,
-                    success: function(response) {
-                        if (response.status === 200 && response.data.length > 0) {
-                            let taskDetails = '';
-                            let updata = response.updata;
-                            let deadline = updata[0].deadline.split("T")[0];
-                            let assigned_date = updata[0].assigned_date.split("T")[0];
+            // Function to fetch task details
+function handleTaskDetails(taskId) {
+    $.ajax({
+        type: 'POST',
+        url: `user/fetchdet/${taskId}`,
+        success: function(response) {
+            if (response.status === 200 && response.data.length > 0) {
+                let taskDetails = '';
+                let updata = response.updata;
+                let deadline = updata[0].deadline.split("T")[0];
+                let assigned_date = updata[0].assigned_date.split("T")[0];
 
-                            $('#forwardfacultyDetailsHeader').html(`
-                                <div class="deadline-header">
-                                    <strong id="assignedDate">Assigned Date:</strong> ${assigned_date}
-                                    &emsp;&emsp;
-                                    <strong id="deadlineDate">Deadline:</strong> ${deadline}
-                                    <br>
-                                </div>
-                            `);
+                $('#forwardfacultyDetailsHeader').html(`
+                    <div class="deadline-header">
+                        <strong id="assignedDate">Assigned Date:</strong> ${assigned_date}
+                        &emsp;&emsp;
+                        <strong id="deadlineDate">Deadline:</strong> ${deadline}
+                        <br>
+                    </div>
+                `);
 
-                            const currentTime = new Date();
-                            const csrfToken = $('meta[name="csrf-token"]').attr("content");
+                const currentDate = new Date();
 
-                            response.data.forEach((task, index) => {
-                                let assignedTime = new Date(task.assigned_date);
-                                let hoursDiff = (currentTime - assignedTime) / (1000 * 60 *
-                                    60); // Convert ms to hours
-                                let isDisabled = task.status != 0 || hoursDiff >= 48;
+                response.data.forEach((task, index) => {
+                    let assignedDate = new Date(task.assigned_date);
+                    let timeDiff = currentDate - assignedDate;
+                    let hourDiff = timeDiff / (1000 * 60 * 60); // Convert ms to hours
+                    let isDisabled = task.status !== 0 || hourDiff >= 48; // Disable if status is 1,2,3 or 48 hours passed
+                    
+                    let formattedCompletedDate = task.completed_date ?
+                        new Date(task.completed_date).toLocaleDateString('en-GB') :
+                        'N/A';
 
-                                let formattedCompletedDate = task.completed_date ?
-                                    new Date(task.completed_date).toLocaleDateString('en-GB') :
-                                    'N/A';
-
-                                taskDetails += `
-                                    <tr>
-                                        <td>${index + 1}</td>
-                                        <td>${task.assigned_to_name}</td>
-                                        <td>
-                                            <span class="badge ${task.status === 3 ? 'bg-success' : 'bg-secondary'}">
-                                                ${task.status === 0 ? 'Submitted' :
-                                                task.status === 2 ? 'Completed' :
-                                                task.status === 3 ? 'Approved' : 'Unknown'}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-success btnapprove" value="${task.id}" title="Approve Task" ${task.status === 3 || task.status === 0 ? 'disabled' : ''}>
-                                                <i class="fas fa-circle-check"></i>
+                    taskDetails += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${task.assigned_to_name}</td>
+                            <td>
+                                <span class="badge ${task.status === 3 ? 'bg-success' : 'bg-secondary'}">
+                                    ${task.status === 0 ? 'Assigned' :
+                                    task.status === 1 ? 'Accepted' :
+                                    task.status === 2 ? 'Completed' :
+                                    task.status === 3 ? 'Approved' : 'Unknown'}
+                                </span>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-success btnapprove" value="${task.id}" title="Approve Task" ${task.status === 3 || task.status === 0 ? 'disabled' : ''}>
+                                    <i class="fas fa-circle-check"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btnredo" value="${task.id}" title="Redo Task" ${task.status === 3 || task.status === 0 ? 'disabled' : ''}>
+                                    <i class="fas fa-arrows-rotate"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary btnreassign" data-id="${task.id}" value="${task.id}" data-status="${task.status}" title="Reassign Task" ${isDisabled ||task.status===1||task.status===2||task.status===3 ? 'disabled' : ''}>
+                                    <i class="fa-solid fa-arrows-turn-to-dots"></i>
+                                </button>
+                                <button type="button" class="btn btn-secondary btnedeadline" data-id="${task.id}"value ="${task.id}" data-status="${task.status}" title="Extend deadline">
+                                                <i class="fa-solid fa-calendar-week"></i>
                                             </button>
-                                            <button type="button" class="btn btn-danger btnredo" value="${task.id}" title="Redo Task" ${task.status === 3 || task.status === 0 ? 'disabled' : ''}>
-                                                <i class="fas fa-arrows-rotate"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-primary btnreassign" data-id="${task.id}"value ="${task.id}" data-status="${task.status}" title="Reassign Task" ${isDisabled ? 'disabled' : ''}>
-                                                <i class="fa-solid fa-arrows-turn-to-dots"></i>
-                                            </button>
-                                        </td>
-                                        <td>${formattedCompletedDate}</td>
-                                    </tr>`;
-                                // If the button should be disabled, update the database
-                                if (isDisabled) {
-                                    $.ajax({
-                                        url: `/tasks/update-status/${task.id}`,
-                                        type: "POST",
-                                        data: {
-                                            _token: csrfToken,
-                                            status: status,
-                                        },
-                                        success: function(response) {
-                                            console.log(`Task ${task.id} status updated to 1`);
-                                        }
-                                    });
-                                }
-                            });
-                            $('#taskDetails').html(taskDetails); // Populate table
-                        } else {
-                            alert(response.message || 'No task details found.');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error fetching task details:', error);
-                        alertify.error('An error occurred while fetching task details. Please try again.');
+                            </td>
+                            <td>${formattedCompletedDate}</td>
+                        </tr>`;
+
+                    // If the button should be disabled due to time constraint, update the database
+                    if (hourDiff >= 48 && task.status === 0) {
+                        $.ajax({
+                            url: `/tasks/update-status/${task.id}`,
+                            type: "POST",
+                            data: {
+                                _token: csrfToken,
+                                status: 1, // Change status to 1 (Accepted)
+                            },
+                            success: function(response) {
+                                console.log(`Task ${task.id} status updated to 1 due to time limit.`);
+                            }
+                        });
                     }
                 });
+
+                $('#taskDetails').html(taskDetails); // Populate table
+            } else {
+                alert(response.message || 'No task details found.');
             }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching task details:', error);
+            alertify.error('An error occurred while fetching task details. Please try again.');
+        }
+    });
+}
 
             // Function to check if all tasks are completed
             function checkTaskStatus(taskId) {
@@ -2396,7 +2434,6 @@
                             $("#reassignForm")[0].reset();
                             $('#reassignModal').modal('hide');
                             $('#viewDetails').modal('hide');
-
                         } else {
                             alertify.error(response.message || 'Failed to reassign the task.');
                         }
@@ -2447,6 +2484,80 @@
                     }
                 });
             });
+            // $(document).on('click', '.btnedeadline', function(e) {
+            //     e.preventDefault();
+            //     var taskId = $(this).val();
+            //     $('#extendDeadlineModal').find('#extenddeadlinetaskId').val(taskId);
+            //     $('#extendDeadlineModal').modal('show');
+            // });
+            $(document).on('click', '.btnedeadline', function(e) {
+e.preventDefault();
+        let taskId = $(this).data("id");
+        console.log(taskId);
+        $.ajax({
+            url:`/task/${taskId}`,
+            type: "GET",
+            success: function(response) {
+                $("#oldDeadline").val(response.deadline);
+                $("#reason").val(response.feedback);
+                $("#extenddeadlinetaskId").val(taskId);
+                $("#extendDeadlineModal").modal("show");
+            }
+        });
+    });
+$(document).on("submit", "#extendDeadlineForm", function (e) {
+    e.preventDefault(); // Prevent page refresh
+    let taskId = $("#extenddeadlinetaskId").val();
+    let oldDeadline = $("#oldDeadline").val();
+    let newDeadline = $("#newDeadline").val();
+    let reason = $("#reason").val();
+    // Converts back to "YYYY-MM-DD"
+
+
+    // Determine values for feedback and deadline
+    let feedback = reason;
+let status = 1; 
+let deadline = oldDeadline;
+let oldDate = new Date(oldDeadline);
+let newDate = new Date(newDeadline);
+
+// Extract only the year, month, and day
+let oldDateOnly = new Date(oldDate.getFullYear(), oldDate.getMonth(), oldDate.getDate());
+let newDateOnly = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate());
+
+// Compare only the date part (ignoring time)
+if (newDateOnly > oldDateOnly) {
+    status = 4;
+    deadline = newDeadline;
+}
+
+
+
+    $.ajax({
+        url: "/update-deadline",
+        type: "POST",
+        data: {
+            task_id: taskId,
+            deadline: deadline,
+            feedback: feedback,
+            status: status,
+            _token: $('meta[name="csrf-token"]').attr("content"), // Include CSRF token
+        },
+        success: function (response) {
+            if (response.success) {
+                alertify.success("Deadline updated successfully!");
+                $("#extendDeadlineModal").modal("hide"); // Close modal
+            } else {
+                alertify.error("Failed to update deadline!");
+            }
+        },
+        error: function (xhr) {
+            alert("Error: " + xhr.responseJSON.error);
+        },
+    });
+});
+
+
         </script>
 </body>
 
