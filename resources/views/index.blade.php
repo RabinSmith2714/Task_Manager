@@ -16,7 +16,56 @@
     <link rel="stylesheet" href="{{ asset('css/index.css') }}">
 
     <style>
+        .scrollable-menu {
+            max-height: 250px;
+            overflow-y: auto;
+            width: 100%;
+        }
 
+        .dropdown {
+            position: relative;
+            width: 100%;
+            /* Ensure full width */
+        }
+
+        .dropdown-menu {
+            width: 100%;
+            /* Same width as button */
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .dropdown-btn {
+            width: 100%;
+            text-align: left;
+            border: 1px solid #ccc;
+            padding: 8px;
+            cursor: pointer;
+            background-color: #fff;
+        }
+
+        .dropdown-menu.show {
+            display: block !important;
+        }
+
+        /* Ensure that dropdown is initially hidden */
+        #deptDropdownList,
+        #facultyDropdownList {
+            display: none;
+        }
+
+        /* Show dropdown when .show class is added */
+        #deptDropdownList.show,
+        #facultyDropdownList.show {
+            display: block;
+        }
+
+        #deptDropdownBtn {
+            white-space: normal;
+            /* Allow text to break onto multiple lines */
+            word-wrap: break-word;
+            max-width: 100%;
+        }
     </style>
 </head>
 
@@ -30,7 +79,7 @@
         </div>
         <div class="menu">
             <a href="{{route('index')}}" class="menu-item">
-                <i class="fas fa-bus text-warning"></i>
+                <i class="fas fa-light fa-list-check" style="color: #FFD43B;"></i>
                 <span>Task Manager</span>
             </a>
         </div>
@@ -93,9 +142,8 @@
                     @if($specialStatus == 0 || $specialStatus == 1 || $specialStatus == 3)
                     <li class="nav-item" role="presentation">
                         <div id="navref2">
-                            <button class="nav-link" id="pend-bus-tab" data-bs-toggle="tab"
-                                data-bs-target="#assignedtask" type="button" role="tab"
-                                aria-controls="profile-tab-pane" aria-selected="false">
+                            <button class="nav-link" id="pend-bus-tab" data-bs-toggle="tab" data-bs-target="#assignedtask"
+                                type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">
                                 <i class="fa-solid fa-bell fa-shake "></i>&nbsp;Assigned Task
                             </button>
                         </div>
@@ -106,9 +154,10 @@
                     @if($specialStatus == 1 || $specialStatus == 2 || $specialStatus == 3 || $specialStatus == 4)
                     <li class="nav-item" role="presentation">
                         <div id="navref3">
-                            <button class="nav-link" id="mytask-bus-tab" data-bs-toggle="tab" data-bs-target="#mytask"
-                                type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">
-                                <i class="fa-solid fa-exclamation fa-beat-fade" style="--fa-beat-fade-opacity: 0.1; --fa-beat-fade-scale: 1.25;"></i>&nbsp;My Task
+                            <button class="nav-link" id="mytask-bus-tab" data-bs-toggle="tab" data-bs-target="#mytask" type="button"
+                                role="tab" aria-controls="contact-tab-pane" aria-selected="false">
+                                <i class="fa-solid fa-exclamation fa-beat-fade"
+                                    style="--fa-beat-fade-opacity: 0.1; --fa-beat-fade-scale: 1.25;"></i>&nbsp;My Task
                             </button>
                         </div>
                     </li>
@@ -127,11 +176,9 @@
                     <!-- History (Visible to Everyone) -->
                     <li class="nav-item" role="presentation">
                         <div id="navref5">
-                            <button class="nav-link" id="rej-bus-tab" data-bs-toggle="tab"
-                                data-bs-target="#history" type="button" role="tab"
-                                aria-controls="disabled-tab-pane" aria-selected="false">
-                                <i class="fa-solid fa fa-history fa-spin"
-                                    style="--fa-flip-x: 1; --fa-flip-y: 0;"></i>&nbsp;History
+                            <button class="nav-link" id="rej-bus-tab" data-bs-toggle="tab" data-bs-target="#history" type="button"
+                                role="tab" aria-controls="disabled-tab-pane" aria-selected="false">
+                                <i class="fa-solid fa fa-history fa-spin" style="--fa-flip-x: 1; --fa-flip-y: 0;"></i>&nbsp;History
                             </button>
                         </div>
                     </li>
@@ -140,8 +187,7 @@
 
             <div class="container-fluid">
                 <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="home-tab"
-                        tabindex="0">
+                    <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                         <div class="p-3 tab-pane active show" id="dashboard" role="tabpanel">
                             <div class="card">
                                 <div class="card-body">
@@ -192,10 +238,10 @@
 
 
                     <!----------Assigned Table -------------------------------------------------------------->
-                    <div class="tab-pane fade" id="assignedtask" role="tabpanel" aria-labelledby="contact-tab"
-                        tabindex="0">
+                    <div class="tab-pane fade" id="assignedtask" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
                         <div class="mb-3 d-flex justify-content-end">
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addtask">Add Task</button>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addtask">Add
+                                Task</button>
                         </div>
                         <div class="custom-table table-responsive">
                             <table class="table mb-0 table-hover " id="assignedtask1">
@@ -226,17 +272,10 @@
                                         <td class="text-center">{{$at->title}}</td>
                                         <td class="text-center">{{$at->description}}</td>
                                         <td class="text-center">
-                                            <button type="button" class="btn btn-info showAssignedFaculty" value="{{$at->task_id}}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Click to approve">View</button>
+                                            <button type="button" class="btn btn-info showAssignedFaculty" value="{{$at->task_id}}"
+                                                data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Click to view">View</button>
                                         </td>
                                         <td class="text-center">{{\Carbon\Carbon::parse($at->deadline)->format('d-m-Y') }}</td>
-                                    </tr>
-                                    @else
-                                    <tr>
-                                        <td class="text-center">{{$sno++}}</td>
-                                        <td class="text-center">{{$at->title}}</td>
-                                        <td class="text-center">{{$at->description}}</td>
-                                        <td class="text-center">{{$at->assigned_to_name}}</td>
-                                        <td class="text-center">{{$at->deadline}}</td>
                                     </tr>
                                     @endif
                                     @endforeach
@@ -250,68 +289,117 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h1 class="modal-title fs-5" id="exampleModalLabel">Add Task</h1>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
                                     <form id="addtaskform" enctype="multipart/form-data">
                                         <input type="hidden" id="hidden_faculty_id" value="{{$facultyId}}" name="faculty_id">
                                         <input type="hidden" id="hidden_faculty_name" value="{{$facultyName}}" name="faculty_name">
+                                        @if($specialStatus == 0 && $Role == 'Principal')
 
                                         <div class="mb-3">
-                                            <label>Select Role:</label><br>
-                                            <select class="form-control" style="width: 100%; height:36px;" name="type" id="type" onchange="toggleSelection()">
-                                                <option value="" disabled selected>Select</option>
-                                                <option value="hod">HOD</option>
+                                            <label for="workType" class="form-label">Type of Role</label>
+                                            <select class="form-control" id="workType" name="workType" onchange="showDropdown()" required>
+                                                <option value="">Select</option>
+                                                <option value="Management">Management</option>
+                                                <option value="center of head">Center of Head</option>
+                                                <option value="hod">Head of the Department</option>
                                                 <option value="faculty">Faculty</option>
                                             </select>
                                         </div>
 
-                                        <!-- Multiple Departments for HOD -->
-                                        <div id="hod-section" style="display: none;">
-                                            <div class="form-group">
-                                                <label for="hod-departments">Departments</label>
-                                                <div class="dropdown" style="width: 100%; position: relative;">
-                                                    <button type="button" class="form-control" id="hod-departments-btn" aria-expanded="false" onclick="toggleDropdown('hod-departments-dropdown', 'hod-departments-btn')" style="text-align : left;">Select</button>
-                                                    <div class="dropdown-content" id="hod-departments-dropdown" style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
-                                                        <label><input type="checkbox" id="hod-selectAll" value="all"> All</label><br>
-                                                        @foreach ($dept as $d)
-                                                        <label><input type="checkbox" name="hod-dname[]" value="{{ $d->dname }}" class="hod-checkbox-item"> {{ $d->dname }}</label><br>
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div class="mb-3" id="managementDropdown" style="display: none;">
+                                            <label for="researchType" class="form-label">Management</label>
+                                            <select class="form-control" id="researchType" name="researchType">
+                                                <option value="">Select</option>
+                                                @foreach($management as $m)
+                                                <option value="{{ $m->id }}">{{ $m->Role }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
 
-                                        <!-- Multiple Departments for Faculty -->
-                                        <div id="faculty-section" style="display: none;">
-                                            <div class="form-group">
-                                                <label for="faculty-departments">Departments</label>
-                                                <div class="dropdown" style="width: 100%; position: relative;">
-                                                    <button type="button" class="form-control" id="faculty-departments-btn" aria-expanded="false" onclick="toggleDropdown('faculty-departments-dropdown', 'faculty-departments-btn')" style="text-align : left;">Select</button>
-                                                    <div class="dropdown-content" id="faculty-departments-dropdown" style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
-                                                        <label><input type="checkbox" id="faculty-selectAll" value="all"> All</label><br>
-                                                        @foreach ($dept as $d)
-                                                        <label><input type="checkbox" name="faculty-dname[]" value="{{ $d->dname }}" class="faculty-checkbox-item"> {{ $d->dname }}</label><br>
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="department-faculty">Faculty</label>
-                                                <div class="dropdown" style="width: 100%; position: relative;">
-                                                    <button type="button" class="form-control" id="department-faculty-btn" aria-expanded="false" onclick="toggleDrop('departments-faculty-dropdown', 'department-faculty-btn')" style="text-align : left;">Select</button>
-                                                    <div class="dropdown-content" id="departments-faculty-dropdown" style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div class=" mb-3" id="cohDropdown" style="display: none;">
+                                            <label for="teachingSubject" class="form-label">Center of Heads</label>
+                                            <select class="form-control" id="teachingSubject" name="teachingSubject">
+                                                <option value="">Select</option>
+                                                @foreach($centerofheads as $c)
+                                                <option value="{{ $c->id }}">{{ $c->Role }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
+
+                                        <div class="mb-3" id="departmentDropdown" style="display: none;">
+                                            <label for="department" class="form-label">Department</label>
+                                            <div class="dropdown">
+                                                <button class="form-control text-start dropdown-toggle" type="button" id="deptDropdownBtn"
+                                                    data-bs-toggle="dropdown">
+                                                    Select Department
+                                                </button>
+                                                <ul class="dropdown-menu scrollable-menu" id="deptDropdownList">
+                                                    @foreach($dept as $d)
+                                                    <li>
+                                                        <label class="dropdown-item">
+                                                            <input type="checkbox" class="dept-checkbox" value="{{ $d->dname }}">
+                                                            {{ $d->dname }}
+                                                        </label>
+                                                    </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                            <input type="hidden" name="selectedDepartments" id="selectedDepartments">
+                                        </div>
+
+                                        <div class="mb-3" id="facultyDropdown" style="display: none;">
+                                            <label for="faculty" class="form-label">Faculty</label>
+                                            <div class="dropdown">
+                                                <button class="form-control text-start dropdown-toggle" type="button" id="facultyDropdownBtn"
+                                                    data-bs-toggle="dropdown">
+                                                    Select Faculty
+                                                </button>
+                                                <ul class="dropdown-menu scrollable-menu" id="facultyDropdownList">
+                                                    <li><label class="dropdown-item">Select Faculty</label></li>
+                                                </ul>
+                                            </div>
+                                            <input type="hidden" name="selectedFaculties" id="selectedFaculties">
+                                        </div>
+                                        @elseif($specialStatus == 1 && $Role == 'student affiars')
+                                        <div class="mb-3">
+                                            <label for="studentaffiars" class="form-label">select Head</label>
+                                            <select class="form-control" id="studentaffiars" name="studentaffiars" required>
+                                                <option value="">Select</option>
+                                                @foreach($studentaffiars as $sa)
+                                                <option value="{{ $sa->id }}">{{ $sa->Role }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        @elseif($specialStatus == 3 && $Role == 'head of department')
+                                        <div class="mb-3">
+                                            <label for="newFaculty" class="form-label">Select Faculty</label>
+                                            <button type="button" class="form-control text-start dropdown-toggle" data-bs-toggle="dropdown"
+                                                id="newFacultyBtn">Select</button>
+                                            <ul class="dropdown-menu" id="newFacultyDropdown">
+                                                @foreach($departmentfaculties as $df)
+                                                <li>
+                                                    <label class="dropdown-item">
+                                                        <input type="checkbox" class="deptfaculty-checkbox" value="{{ $df->id }}"
+                                                            onchange="updateSelecteddepartmentFaculties()">
+                                                        {{ $df->name }}
+                                                    </label>
+                                                </li>
+                                                @endforeach
+                                            </ul>
+                                            <input type="hidden" name="selecteddeptFaculties" id="selecteddeptFaculties">
+                                        </div>
+
+                                        @endif
+
+
 
                                         <div class="mb-3">
                                             <label for="title" class="form-label">Title</label>
-                                            <input class="form-control" type="text" id="title"
-                                                name="title" placeholder="Enter Title" required>
+                                            <input class="form-control" type="text" id="title" name="title" placeholder="Enter Title"
+                                                required>
                                         </div>
 
                                         <div class="mb-3">
@@ -319,18 +407,28 @@
                                             <input type="text" class="form-control" name="description" id="description"
                                                 placeholder="Enter Description" required>
                                         </div>
+
                                         <input type="hidden" name="status" value="0">
 
                                         <div class="mb-3">
+                                            <label for="level" class="form-label">Complexity Level</label>
+                                            <select class="form-control" id="level" name="level" required>
+                                                <option value="">Select</option>
+                                                <option value="Easy">Easy</option>
+                                                <option value="Medium">Medium</option>
+                                                <option value="Hard">Hard</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
                                             <label for="deadline" class="form-label">Deadline</label>
-                                            <input type="date" class="form-control" name="deadline"
-                                                id="deadline" required>
+                                            <input type="date" class="form-control" name="deadline" id="deadline" required>
                                         </div>
 
                                         <input type="hidden" class="form-control" name="assigned_date" id="assigned_date" required>
+
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                             <button type="submit" class="btn btn-primary" id="submitDepartments">Submit</button>
                                         </div>
                                     </form>
@@ -340,18 +438,21 @@
                     </div>
 
                     <!----------------------- My Task Starts ------------------------------------->
-                    <div class="tab-pane fade" id="mytask" role="tabpanel" aria-labelledby="contact-tab"
-                        tabindex="0">
+                    <div class="tab-pane fade" id="mytask" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="work-bus-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">My task</button>
+                                <button class="nav-link active" id="work-bus-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane"
+                                    type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">My task</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="work-bus-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Forwarded task</button>
+                                <button class="nav-link" id="work-bus-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane"
+                                    type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Forwarded
+                                    task</button>
                             </li>
                         </ul>
                         <div class="tab-content" id="myTabContent">
-                            <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                            <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab"
+                                tabindex="0">
                                 <div class="custom-table table-responsive">
                                     <div class="custom-table table-responsive">
                                         <table class="table mb-0 table-hover " id="mytask1">
@@ -372,6 +473,7 @@
                                                 @php
                                                 $task_Deadline = \Carbon\Carbon::parse($my->deadline)->startOfDay();
                                                 $isToday = $task_Deadline->equalTo($currentDate);
+                                                $reasonExist = !is_null($my->reason);
                                                 @endphp
                                                 <tr class="{{ $isToday ? 'table-warning' : ''}}">
                                                     <td class="text-center">{{$sno++}}</td>
@@ -380,32 +482,40 @@
                                                     <td class="text-center">{{$my->title}}</td>
                                                     <td class="text-center">{{$my->description}}</td>
                                                     <td class="text-center">
-                                                        @if(($specialStatus == 3 && $my->status == 0) || ($specialStatus == 4 && $my->status == 0) || ($specialStatus === null))
-                                                        <button type="button" class="btn btn-success btnaccept"
-                                                            value="{{$my->task_id}}">
+                                                        @if(($specialStatus == 3 && $my->status == 0) || ($specialStatus == 4 && $my->status == 0))
+
+                                                        <button type="button" class="btn btn-success btnaccept" value="{{$my->task_id}}">
                                                             <i class="fas fa-check"></i>
                                                         </button>
-                                                        @elseif(($specialStatus == 1 && $my->status == 0) || ($specialStatus == 2 && $my->status == 0))
-                                                        <button type="button"
-                                                            class="btn btn-primary showImage"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#forwardModal"
-                                                            data-task-id="{{ $my->task_id }}"
-                                                            data-status="{{ $my->status }}"
-                                                            data-deadline="{{ $my->deadline }}"> <!-- Add the deadline as a data attribute -->
+                                                        @elseif(($specialStatus == 1 && $my->status == 0) || ($specialStatus == 2 && $my->status ==
+                                                        0)|| ($specialStatus == 3 && $my->status == 1))
+                                                        <button type="button" class="btn btn-primary showImage" data-bs-toggle="modal"
+                                                            data-bs-target="#forwardModal" data-task-id="{{ $my->task_id }}"
+                                                            data-status="{{ $my->status }}" data-deadline="{{ $my->deadline }}">
+                                                            <!-- Add the deadline as a data attribute -->
                                                             <i class="fas fa-share"></i>
                                                         </button>
-                                                        @elseif(($specialStatus == 3 && $my->status == 1) || ($specialStatus == 4 && $my->status == 1) || ($specialStatus === null))
-                                                        <button type="button" class="btn btn-success btncomplete"
-                                                            value="{{$my->task_id}}">
+                                                        @elseif(($specialStatus == 3 && $my->status == 1) || ($specialStatus == 4 && $my->status ==
+                                                        1) )
+                                                        <button type="button" class="btn btn-success btncomplete" value="{{$my->task_id}}">
                                                             <i class="fas fa-circle"></i>
                                                         </button>
-                                                        @elseif(($specialStatus == 3 && $my->status == 2) || ($specialStatus == 4 && $my->status == 2) || ($specialStatus === null))
-                                                        <button type="button" class="btn btn-secondary "
-                                                            value="{{$my->task_id}}" disabled>
+                                                        @elseif(($specialStatus == 3 && $my->status == 2) || ($specialStatus == 4 && $my->status ==
+                                                        2) )
+                                                        <button type="button" class="btn btn-secondary " value="{{$my->task_id}}" disabled>
                                                             <i class="fas fa-circle"></i>
                                                         </button>
 
+                                                        @endif
+                                                        @if($reasonExist)
+                                                        <button type="button" class="btn btn-secondary btnmyreason" value="{{$my->task_id}}">
+                                                            <i class="fas fa-light fa-message"></i>
+                                                        </button>
+                                                        @endif
+                                                        @if($my->status==1)
+                                                        <button type="button" class="btn btn-danger btnextend" value="{{$my->task_id}}">
+                                                            <i class="fas fa-solid fa-calendar-days"></i>
+                                                        </button>
                                                         @endif
                                                     <td class="text-center">{{\Carbon\Carbon::parse($my->deadline)->format('d-m-Y') }}</td>
                                                 </tr>
@@ -416,7 +526,8 @@
                                 </div>
                             </div>
 
-                            <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                            <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab"
+                                tabindex="0">
                                 <div class="custom-table table-responsive">
                                     <table class="table mb-0 table-hover " id="mytask2">
                                         <thead class="gradient-header">
@@ -446,7 +557,9 @@
                                                 <td class="text-center">{{$for->assigned_by_id}} - {{$for->assigned_by_name}} </td>
                                                 <td class="text-center">{{$for->title}}</td>
                                                 <td class="text-center">{{$for->description}}</td>
-                                                <td class="text-center"><button type="button" class="btn btn-info showForwardedFaculty" value="{{$for->task_id}}-{{$for->assigned_by_id}}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Click to approve">View</button></td>
+                                                <td class="text-center"><button type="button" class="btn btn-info showForwardedFaculty"
+                                                        value="{{$for->task_id}}-{{$for->assigned_by_id}}" data-bs-toggle="tooltip"
+                                                        data-bs-placement="top" data-bs-title="Click to approve">View</button></td>
                                                 <td class="text-center">{{\Carbon\Carbon::parse($for->deadline)->format('d-m-Y') }}</td>
                                             </tr>
                                             @endforeach
@@ -460,7 +573,8 @@
                     <!----------------------- My Task Ends ------------------------------------->
 
                     <!----------------------- forward modal ------------------------------------->
-                    <div class="modal fade" id="forwardModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="forwardModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -473,56 +587,37 @@
                                         <input type="hidden" name="status" id="status" value="">
                                         <input type="hidden" id="hidden_faculty_id" value="{{$facultyId}}" name="faculty_id">
                                         <input type="hidden" id="hidden_faculty_name" value="{{ $facultyName }}" name="faculty_name">
+                                        @if($specialStatus == 1 && $Role == 'student affiars')
                                         <div class="mb-3">
-                                            <label>Select Role:</label><br>
-                                            <select class="form-control" style="width: 100%; height:36px;" name="forwardtype" id="forwardtype" onchange="toggleForwardTaskSelection()">
-                                                <option value="" disabled selected>Select</option>
-                                                <option value="hod">HOD</option>
-                                                <option value="faculty">Faculty</option>
+                                            <label for="fstudentaffiars" class="form-label">select Head</label>
+                                            <select class="form-control" id="fstudentaffiars" name="fstudentaffiars" required>
+                                                <option value="">Select</option>
+                                                @foreach($studentaffiars as $sa)
+                                                <option value="{{ $sa->id }}">{{ $sa->Role }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
 
-                                        <!-- Multiple Departments for HOD -->
-                                        <div id="forward-hod-section" style="display: none;">
-                                            <div class="form-group">
-                                                <label for="forward-hod-departments">Departments</label>
-                                                <div class="dropdown" style="width: 100%; position: relative;">
-                                                    <button type="button" class="form-control" id="forward-hod-departments-btn" aria-expanded="false" onclick="toggleForwardTaskDropdown('forward-hod-departments-dropdown', 'forward-hod-departments-btn')" style="text-align : left;">Select</button>
-                                                    <div class="dropdown-content" id="forward-hod-departments-dropdown" style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
-                                                        <label><input type="checkbox" id="forward-hod-selectAll" value="all"> All</label><br>
-                                                        @foreach ($dept as $d)
-                                                        <label><input type="checkbox" name="forward-hod-dname[]" value="{{ $d->dname }}" class="forward-hod-checkbox-item"> {{ $d->dname }}</label><br>
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        @elseif($specialStatus == 3 && $Role == 'head of department')
+                                        <div class="mb-3">
+                                            <label for="fnewFaculty" class="form-label">Select Faculty</label>
+                                            <button type="button" class="form-control text-start dropdown-toggle" data-bs-toggle="dropdown"
+                                                id="fnewFacultyBtn">Select</button>
+                                            <ul class="dropdown-menu" id="fnewFacultyDropdown">
+                                                @foreach($departmentfaculties as $df)
+                                                <li>
+                                                    <label class="dropdown-item">
+                                                        <input type="checkbox" class="fdeptfaculty-checkbox" value="{{ $df->id }}"
+                                                            onchange="updateSelectedforwarddepartmentFaculties()">
+                                                        {{ $df->name }}
+                                                    </label>
+                                                </li>
+                                                @endforeach
+                                            </ul>
+                                            <input type="hidden" name="selectedforwarddeptFaculties" id="selectedforwarddeptFaculties">
                                         </div>
 
-                                        <!-- Multiple Departments for Faculty -->
-                                        <div id="forward-faculty-section" style="display: none;">
-                                            <div class="form-group">
-                                                <label for="forward-faculty-departments">Departments</label>
-                                                <div class="dropdown" style="width: 100%; position: relative;">
-                                                    <button type="button" class="form-control" id="forward-faculty-departments-btn" aria-expanded="false" onclick="toggleForwardTaskDropdown('forward-faculty-departments-dropdown', 'faculty-departments-btn')" style="text-align : left;">Select</button>
-                                                    <div class="forward-dropdown-content" id="forward-faculty-departments-dropdown" style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
-                                                        <label><input type="checkbox" id="forward-faculty-selectAll" value="all"> All</label><br>
-                                                        @foreach ($dept as $d)
-                                                        <label><input type="checkbox" name="forward-faculty-dname[]" value="{{ $d->dname }}" class="forward-faculty-checkbox-item"> {{ $d->dname }}</label><br>
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="forward-department-faculty">Faculty</label>
-                                                <div class="dropdown" style="width: 100%; position: relative;">
-                                                    <button type="button" class="form-control" id="forward-department-faculty" aria-expanded="false" onclick="toggleForwardTaskDrop('forward-departments-faculty-dropdown', 'forward-department-faculty')" style="text-align : left;">Select</button>
-                                                    <div class="dropdown-content" id="forward-departments-faculty-dropdown" style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
+                                        @endif
                                         <div class="mb-3">
                                             <label for="deadline" class="form-label">Deadline</label>
                                             <input type="date" class="form-control" name="forwarddeadline" id="forwarddeadline" required>
@@ -530,8 +625,7 @@
 
                                         <input type="hidden" class="form-control" name="forwarded_date" id="forwarded_date" required>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                             <button type="submit" class="btn btn-primary" id="submitDepartments">Submit</button>
                                         </div>
                                     </form>
@@ -541,18 +635,21 @@
                     </div>
 
                     <!----------------------------Completed Task starts ---------------------------------------------------->
-                    <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="disabled-tab"
-                        tabindex="0">
+                    <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="disabled-tab" tabindex="0">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="completed-bus-tab" data-bs-toggle="tab" data-bs-target="#homeu-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">My tasks</button>
+                                <button class="nav-link active" id="completed-bus-tab" data-bs-toggle="tab"
+                                    data-bs-target="#homeu-tab-pane" type="button" role="tab" aria-controls="home-tab-pane"
+                                    aria-selected="true">My tasks</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="completed-bus-tab" data-bs-toggle="tab" data-bs-target="#profileu-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Assigned task</button>
+                                <button class="nav-link" id="completed-bus-tab" data-bs-toggle="tab" data-bs-target="#profileu-tab-pane"
+                                    type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Assigned task</button>
                             </li>
                         </ul>
                         <div class="tab-content" id="myTabContent">
-                            <div class="tab-pane fade show active" id="homeu-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                            <div class="tab-pane fade show active" id="homeu-tab-pane" role="tabpanel" aria-labelledby="home-tab"
+                                tabindex="0">
                                 <div class="custom-table table-responsive">
                                     <table class="table mb-0 table-hover " id="completed1">
                                         <thead class="gradient-header">
@@ -584,7 +681,8 @@
                                 </div>
                             </div>
 
-                            <div class="tab-pane fade" id="profileu-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                            <div class="tab-pane fade" id="profileu-tab-pane" role="tabpanel" aria-labelledby="profile-tab"
+                                tabindex="0">
                                 <div class="custom-table table-responsive">
                                     <table class="table mb-0 table-hover " id="completed2">
                                         <thead class="gradient-header">
@@ -606,7 +704,9 @@
                                                 <td class="text-center">{{$at->title}}</td>
                                                 <td class="text-center">{{$at->description}}</td>
                                                 <td class="text-center">
-                                                    <button type="button" class="btn btn-info CshowAssignedFaculty" value="{{$at->task_id}}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Click to approve">View</button>
+                                                    <button type="button" class="btn btn-info CshowAssignedFaculty" value="{{$at->task_id}}"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top"
+                                                        data-bs-title="Click to approve">View</button>
                                                 </td>
                                                 <td class="text-center">{{\Carbon\Carbon::parse($at->deadline)->format('d-m-Y') }}</td>
                                             </tr>
@@ -654,10 +754,12 @@
                     <div class="shadow-lg modal-content rounded-3">
                         <div class="text-white modal-header bg-primary">
                             <h1 class="modal-title fs-5" id="exampleModalLabel">Faculty Details</h1>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <div class="p-2 mb-3 rounded d-flex justify-content-between bg-light " id="forwardfacultyDetailsHeader" style="color: #333; font-weight: bold;">
+                            <div class="p-2 mb-3 rounded d-flex justify-content-between bg-light " id="forwardfacultyDetailsHeader"
+                                style="color: #333; font-weight: bold;">
                             </div>
 
                             <table class="table text-center align-middle rounded shadow-sm table-hover table-bordered">
@@ -666,7 +768,7 @@
                                         <th scope="col">S No</th>
                                         <th scope="col">Faculty</th>
                                         <th scope="col">Status</th>
-                                        <th scope="col">Approval</th>
+                                        <th scope="col">Action</th>
                                         <th scope="col">Completed Date</th>
                                     </tr>
                                 </thead>
@@ -677,7 +779,8 @@
                         </div>
                         <div class="modal-footer d-flex justify-content-end">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary btnfinish" id="finishTask" data-task-id="" disabled>Finish Task</button>
+                            <button type="button" class="btn btn-primary btnfinish" id="finishTask" data-task-id="" disabled>Finish
+                                Task</button>
                         </div>
                     </div>
                 </div>
@@ -689,12 +792,12 @@
                     <div class="shadow-lg modal-content rounded-3">
                         <div class="text-white modal-header bg-primary">
                             <h1 class="modal-title fs-5" id="exampleModalLabel">Faculty Details</h1>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="p-3 mb-3 rounded shadow-sm d-flex justify-content-between"
-                                style=" color: #333; font-weight: bold;"
-                                id="cassignedDetailsHeader">
+                                style=" color: #333; font-weight: bold;" id="cassignedDetailsHeader">
                             </div>
                             <table class="table text-center align-middle rounded shadow table-hover table-bordered"
                                 style="border: 2px solidrgb(12, 113, 43);">
@@ -711,7 +814,8 @@
                             </table>
                         </div>
                         <div class="modal-footer d-flex justify-content-end">
-                            <button type="button" class="text-white btn fw-bold" style="background: linear-gradient(135deg, #43cea2, #185a9d);" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="text-white btn fw-bold"
+                                style="background: linear-gradient(135deg, #43cea2, #185a9d);" data-bs-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
@@ -743,7 +847,8 @@
             </div>
 
             <!--forward redo reason modal-->
-            <div class="modal fade" id="fredoreasonModal" tabindex="-1" aria-labelledby="reasonfModalLabel" aria-hidden="true">
+            <div class="modal fade" id="fredoreasonModal" tabindex="-1" aria-labelledby="reasonfModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -768,15 +873,17 @@
             </div>
 
             <!-------------------------------Forward Faculty details modal ----------------------------------->
-            <div class="modal fade" id="forwardviewDetails" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="forwardviewDetails" tabindex="-1" aria-labelledby="exampleModalLabel">
                 <div class="modal-dialog modal-lg">
                     <div class="shadow-lg modal-content rounded-3">
                         <div class="text-white modal-header bg-primary">
                             <h1 class="modal-title fs-5" id="exampleModalLabel">Faculty Details</h1>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <div class="p-2 mb-3 rounded d-flex justify-content-between bg-light " id="forwardassignedDetailsHeader"></div>
+                            <div class="p-2 mb-3 rounded d-flex justify-content-between bg-light " id="forwardassignedDetailsHeader">
+                            </div>
                             <table class="table text-center align-middle rounded shadow-sm table-hover table-bordered">
                                 <thead class="text-white bg-dark">
                                     <tr>
@@ -794,7 +901,8 @@
                         </div>
                         <div class="modal-footer d-flex justify-content-end">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary btnfinish" id="forwardfinishTask" data-task-id="" disabled>Finish Task</button>
+                            <button type="button" class="btn btn-primary btnfinish" id="forwardfinishTask" data-task-id=""
+                                disabled>Finish Task</button>
                         </div>
                     </div>
                 </div>
@@ -823,7 +931,8 @@
                                 <input type="hidden" id="hidden_faculty_name" value="{{ $facultyName }}" name="faculty_name">
                                 <div class="mb-3">
                                     <label>Select Role:</label><br>
-                                    <select class="form-control" style="width: 100%; height:36px;" name="reassigntype" id="reassigntype" onchange="toggleForwardTaskSelection()">
+                                    <select class="form-control" style="width: 100%; height:36px;" name="reassigntype" id="reassigntype"
+                                        onchange="toggleForwardTaskSelection()">
                                         <option value="" disabled selected>Select</option>
                                         <option value="hod">HOD</option>
                                         <option value="faculty">Faculty</option>
@@ -835,11 +944,15 @@
                                     <div class="form-group">
                                         <label for="forward-hod-departments">Departments</label>
                                         <div class="dropdown" style="width: 100%; position: relative;">
-                                            <button type="button" class="form-control" id="forward-hod-departments-btn" aria-expanded="false" onclick="toggleForwardTaskDropdown('forward-hod-departments-dropdown', 'forward-hod-departments-btn')" style="text-align : left;">Select</button>
-                                            <div class="dropdown-content" id="forward-hod-departments-dropdown" style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
+                                            <button type="button" class="form-control" id="forward-hod-departments-btn" aria-expanded="false"
+                                                onclick="toggleForwardTaskDropdown('forward-hod-departments-dropdown', 'forward-hod-departments-btn')"
+                                                style="text-align : left;">Select</button>
+                                            <div class="dropdown-content" id="forward-hod-departments-dropdown"
+                                                style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
                                                 <label><input type="checkbox" id="forward-hod-selectAll" value="all"> All</label><br>
                                                 @foreach ($dept as $d)
-                                                <label><input type="checkbox" name="forward-hod-dname[]" value="{{ $d->dname }}" class="forward-hod-checkbox-item"> {{ $d->dname }}</label><br>
+                                                <label><input type="checkbox" name="forward-hod-dname[]" value="{{ $d->dname }}"
+                                                        class="forward-hod-checkbox-item"> {{ $d->dname }}</label><br>
                                                 @endforeach
                                             </div>
                                         </div>
@@ -851,11 +964,16 @@
                                     <div class="form-group">
                                         <label for="forward-faculty-departments">Departments</label>
                                         <div class="dropdown" style="width: 100%; position: relative;">
-                                            <button type="button" class="form-control" id="forward-faculty-departments-btn" aria-expanded="false" onclick="toggleForwardTaskDropdown('forward-faculty-departments-dropdown', 'faculty-departments-btn')" style="text-align : left;">Select</button>
-                                            <div class="forward-dropdown-content" id="forward-faculty-departments-dropdown" style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
+                                            <button type="button" class="form-control" id="forward-faculty-departments-btn"
+                                                aria-expanded="false"
+                                                onclick="toggleForwardTaskDropdown('forward-faculty-departments-dropdown', 'faculty-departments-btn')"
+                                                style="text-align : left;">Select</button>
+                                            <div class="forward-dropdown-content" id="forward-faculty-departments-dropdown"
+                                                style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
                                                 <label><input type="checkbox" id="forward-faculty-selectAll" value="all"> All</label><br>
                                                 @foreach ($dept as $d)
-                                                <label><input type="checkbox" name="forward-faculty-dname[]" value="{{ $d->dname }}" class="forward-faculty-checkbox-item"> {{ $d->dname }}</label><br>
+                                                <label><input type="checkbox" name="forward-faculty-dname[]" value="{{ $d->dname }}"
+                                                        class="forward-faculty-checkbox-item"> {{ $d->dname }}</label><br>
                                                 @endforeach
                                             </div>
                                         </div>
@@ -863,8 +981,11 @@
                                     <div class="form-group">
                                         <label for="forward-department-faculty">Faculty</label>
                                         <div class="dropdown" style="width: 100%; position: relative;">
-                                            <button type="button" class="form-control" id="forward-department-faculty" aria-expanded="false" onclick="toggleForwardTaskDrop('forward-departments-faculty-dropdown', 'forward-department-faculty')" style="text-align : left;">Select</button>
-                                            <div class="dropdown-content" id="forward-departments-faculty-dropdown" style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
+                                            <button type="button" class="form-control" id="forward-department-faculty" aria-expanded="false"
+                                                onclick="toggleForwardTaskDrop('forward-departments-faculty-dropdown', 'forward-department-faculty')"
+                                                style="text-align : left;">Select</button>
+                                            <div class="dropdown-content" id="forward-departments-faculty-dropdown"
+                                                style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
 
                                             </div>
                                         </div>
@@ -878,10 +999,8 @@
                                 </div>
                                 <input type="hidden" class="form-control" name="forwarded_date" id="forwarded_date" required> --}}
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary"
-                                        id="reassignsubmit">Submit</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary" id="reassignsubmit">Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -895,8 +1014,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Forward Task</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
                         <div class="modal-body">
@@ -914,7 +1032,8 @@
                                 <input type="hidden" id="hidden_faculty_name" value="{{ $facultyName }}" name="faculty_name">
                                 <div class="mb-3">
                                     <label>Select Role:</label><br>
-                                    <select class="form-control" style="width: 100%; height:36px;" name="reassigntype" id="reassigntype" onchange="toggleForwardTaskSelection()">
+                                    <select class="form-control" style="width: 100%; height:36px;" name="reassigntype" id="reassigntype"
+                                        onchange="toggleForwardTaskSelection()">
                                         <option value="" disabled selected>Select</option>
                                         <option value="hod">HOD</option>
                                         <option value="faculty">Faculty</option>
@@ -926,11 +1045,15 @@
                                     <div class="form-group">
                                         <label for="forward-hod-departments">Departments</label>
                                         <div class="dropdown" style="width: 100%; position: relative;">
-                                            <button type="button" class="form-control" id="forward-hod-departments-btn" aria-expanded="false" onclick="toggleForwardTaskDropdown('forward-hod-departments-dropdown', 'forward-hod-departments-btn')" style="text-align : left;">Select</button>
-                                            <div class="dropdown-content" id="forward-hod-departments-dropdown" style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
+                                            <button type="button" class="form-control" id="forward-hod-departments-btn" aria-expanded="false"
+                                                onclick="toggleForwardTaskDropdown('forward-hod-departments-dropdown', 'forward-hod-departments-btn')"
+                                                style="text-align : left;">Select</button>
+                                            <div class="dropdown-content" id="forward-hod-departments-dropdown"
+                                                style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
                                                 <label><input type="checkbox" id="forward-hod-selectAll" value="all"> All</label><br>
                                                 @foreach ($dept as $d)
-                                                <label><input type="checkbox" name="forward-hod-dname[]" value="{{ $d->dname }}" class="forward-hod-checkbox-item"> {{ $d->dname }}</label><br>
+                                                <label><input type="checkbox" name="forward-hod-dname[]" value="{{ $d->dname }}"
+                                                        class="forward-hod-checkbox-item"> {{ $d->dname }}</label><br>
                                                 @endforeach
                                             </div>
                                         </div>
@@ -942,11 +1065,16 @@
                                     <div class="form-group">
                                         <label for="forward-faculty-departments">Departments</label>
                                         <div class="dropdown" style="width: 100%; position: relative;">
-                                            <button type="button" class="form-control" id="forward-faculty-departments-btn" aria-expanded="false" onclick="toggleForwardTaskDropdown('forward-faculty-departments-dropdown', 'faculty-departments-btn')" style="text-align : left;">Select</button>
-                                            <div class="forward-dropdown-content" id="forward-faculty-departments-dropdown" style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
+                                            <button type="button" class="form-control" id="forward-faculty-departments-btn"
+                                                aria-expanded="false"
+                                                onclick="toggleForwardTaskDropdown('forward-faculty-departments-dropdown', 'faculty-departments-btn')"
+                                                style="text-align : left;">Select</button>
+                                            <div class="forward-dropdown-content" id="forward-faculty-departments-dropdown"
+                                                style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
                                                 <label><input type="checkbox" id="forward-faculty-selectAll" value="all"> All</label><br>
                                                 @foreach ($dept as $d)
-                                                <label><input type="checkbox" name="forward-faculty-dname[]" value="{{ $d->dname }}" class="forward-faculty-checkbox-item"> {{ $d->dname }}</label><br>
+                                                <label><input type="checkbox" name="forward-faculty-dname[]" value="{{ $d->dname }}"
+                                                        class="forward-faculty-checkbox-item"> {{ $d->dname }}</label><br>
                                                 @endforeach
                                             </div>
                                         </div>
@@ -954,8 +1082,11 @@
                                     <div class="form-group">
                                         <label for="forward-department-faculty">Faculty</label>
                                         <div class="dropdown" style="width: 100%; position: relative;">
-                                            <button type="button" class="form-control" id="forward-department-faculty" aria-expanded="false" onclick="toggleForwardTaskDrop('forward-departments-faculty-dropdown', 'forward-department-faculty')" style="text-align : left;">Select</button>
-                                            <div class="dropdown-content" id="forward-departments-faculty-dropdown" style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
+                                            <button type="button" class="form-control" id="forward-department-faculty" aria-expanded="false"
+                                                onclick="toggleForwardTaskDrop('forward-departments-faculty-dropdown', 'forward-department-faculty')"
+                                                style="text-align : left;">Select</button>
+                                            <div class="dropdown-content" id="forward-departments-faculty-dropdown"
+                                                style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
                                             </div>
                                         </div>
                                     </div>
@@ -970,6 +1101,111 @@
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     <button type="submit" class="btn btn-primary" id="reassignforwardsubmit">Submit</button>
                                 </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- REASON DISPLAY MODAL--}}
+            <div class="modal fade" id="reasonDisplayModal" tabindex="-1" aria-labelledby="reasonfModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="reasonfModalLabel">Reason</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="fredoreasonForm">
+                                <input type="hidden" id="forwardtaskId" name="task_id">
+                                <div class="mb-3">
+                                    <label for="fredoreasonText" class="form-label">Reason</label>
+                                    <label class="form-control" id="reasonDisplayText" rows="3" required></label>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- extend deadline modal --}}
+            <div class="modal fade" id="extendDeadlineModal" tabindex="-1" aria-labelledby="extendDeadlineLabel"
+                aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="extendDeadlineLabel">Extend Deadline</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="extendDeadlineForm">
+                                <input type="hidden" id="extenddeadlinetaskId" name="task_id">
+                                <div class="mb-3">
+                                    <label for="reason" class="form-label">Reason for Extension</label>
+                                    <input type="text" class="form-control" id="reason" name="reason" required disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="oldDeadline" class="form-label">Current Deadline</label>
+                                    <input type="text" class="form-control" id="oldDeadline" name="oldDeadline" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newDeadline" class="form-label">Extend Deadline</label>
+                                    <input type="date" class="form-control" id="newDeadline" name="newDeadline">
+                                </div>
+                                <input type="hidden" id="taskId" name="taskId">
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- REASON DISPLAY MODAL -->
+            <div class="modal fade" id="reasonModal" tabindex="-1" aria-labelledby="reasonModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="reasonModalLabel">Provide Reason</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="reasonForm">
+                                <input type="hidden" id="taskId" name="task_id">
+                                <div class="mb-3">
+                                    <label for="reasonText" class="form-label">Reason</label>
+                                    <textarea class="form-control" id="reasonText" rows="3" required></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="submitReason">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- extend deadline modal --}}
+            <div class="modal fade" id="requestdeadlineModal" tabindex="-1" aria-labelledby="reasonfModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="reasonfModalLabel">Reason for Deadline Extension</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="extndDeadlineForm">
+                                <input type="hidden" id="task_id" name="task_id">
+                                <div class="mb-3">
+                                    <label for="reasonInput" class="form-label">Enter Reason</label>
+                                    <textarea id="reasonInput" name="reason" class="form-control" rows="3" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit</button>
                             </form>
                         </div>
                     </div>
@@ -1194,7 +1430,8 @@
             // Function to open the modal and populate its contents
             function openModal(title, deadline, description) {
                 const modal = document.getElementById('task-modal');
-                document.getElementById('modal-title').innerHTML = `<img src="https://icon-library.com/images/description-icon/description-icon-26.jpg" alt="Task Icon" class="modal-icon"> Description`;
+                document.getElementById('modal-title').innerHTML =
+                    `<img src="https://icon-library.com/images/description-icon/description-icon-26.jpg" alt="Task Icon" class="modal-icon"> Description`;
                 document.getElementById('modal-description').innerText = `Description:${description}`;
                 modal.style.display = 'flex'; // Show the modal
             }
@@ -1325,124 +1562,65 @@
             new DataTable('#overdue1');
             new DataTable('#history1');
 
-            // for dropdown
-            function toggleSelection() {
-                const type = document.getElementById('type').value;
-                document.getElementById('hod-section').style.display = type === 'hod' ? 'block' : 'none';
-                document.getElementById('faculty-section').style.display = type === 'faculty' ? 'block' : 'none';
-            }
 
-            // Common function for toggling dropdown visibility
-            function toggleDropdown(dropdownId, buttonId) {
-                const dropdown = document.getElementById(dropdownId);
-                const button = document.getElementById(buttonId);
-                const isVisible = dropdown.style.display === 'block';
-                dropdown.style.display = isVisible ? 'none' : 'block';
-                button.setAttribute('aria-expanded', !isVisible);
-            }
-
-            // Com+mon function for updating button text based on selected items
-            function updateButtonText(dropdownId, buttonId, checkboxClass) {
-                const selectedCheckboxes = Array.from(document.querySelectorAll(`.${checkboxClass}:checked`))
-                    .map(checkbox => checkbox.parentElement.textContent.trim());
-                const button = document.getElementById(buttonId);
-                if (selectedCheckboxes.length === 0) {
-                    button.textContent = 'Select';
-                } else if (selectedCheckboxes.length <= 2) {
-                    button.textContent = selectedCheckboxes.join(', ');
-                } else {
-                    button.textContent = `${selectedCheckboxes.length} selected`;
-                }
-            }
-
-            // Common function for handling "Select All" and individual checkboxes
-            function handleCheckboxSelection(selectAllId, checkboxClass, buttonId) {
-                const selectAll = document.getElementById(selectAllId);
-                const checkboxes = document.querySelectorAll(`.${checkboxClass}`);
-
-                // Update all checkboxes when "Select All" is checked/unchecked
-                selectAll.addEventListener('change', function() {
-                    checkboxes.forEach(checkbox => checkbox.checked = selectAll.checked);
-                    updateButtonText(selectAllId, buttonId, checkboxClass);
-                });
-
-                // Update "Select All" and button text when individual checkboxes are changed
-                checkboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', function() {
-                        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-                        selectAll.checked = allChecked;
-                        updateButtonText(selectAllId, buttonId, checkboxClass);
-                    });
-                });
-            }
-            document.getElementById('submitDepartments').addEventListener('click', function() {
-                // Get all checked checkboxes and collect their department names
-                const selectedCheckboxes = Array.from(document.querySelectorAll('.checkbox-item:checked'))
-                    .map(checkbox => checkbox.value);
-            });
-
-            // Initialize dropdowns for both HOD and Faculty sections
-            document.addEventListener('DOMContentLoaded', function() {
-                // Initialize HOD Section Dropdown
-                handleCheckboxSelection('hod-selectAll', 'hod-checkbox-item', 'hod-departments-btn');
-
-                // Initialize Faculty Section Dropdown
-                handleCheckboxSelection('faculty-selectAll', 'faculty-checkbox-item', 'faculty-departments-btn');
-                handleCheckboxSelection('.select-all-faculty', 'department-faculty-checkbox', 'department-faculty-btn');
-
-                // Close dropdowns when clicking outside
-                window.addEventListener('click', function(event) {
-                    const hodDropdown = document.getElementById('hod-departments-dropdown');
-                    const facultyDropdown = document.getElementById('faculty-departments-dropdown');
-                    const deptfacultyDropdown = document.getElementById('departments-faculty-dropdown');
-                    if (!hodDropdown.contains(event.target) && event.target.id !== 'hod-departments-btn') {
-                        hodDropdown.style.display = 'none';
-                    }
-                    if (!facultyDropdown.contains(event.target) && event.target.id !== 'faculty-departments-btn') {
-                        facultyDropdown.style.display = 'none';
-                    }
-                    if (!deptfacultyDropdown.contains(event.target) && event.target.id !== 'department-faculty-btn') {
-                        deptfacultyDropdown.style.display = 'none';
-                    }
-                });
-
-                // Close dropdowns on 'Escape' key press
-                document.addEventListener('keydown', function(event) {
-                    if (event.key === 'Escape') {
-                        document.getElementById('hod-departments-dropdown').style.display = 'none';
-                        document.getElementById('faculty-departments-dropdown').style.display = 'none';
-                        document.getElementById('departments-faculty-dropdown').style.display = 'none';
-                    }
-                });
-            });
-
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape') {
-                    dropdown.style.display = 'none';
-                }
-            });
 
             //Add  task
             $(document).on('submit', '#addtaskform', function(e) {
-                e.preventDefault(); // Prevent form submission
-                var selectedFaculties = getSelectedFaculties(); // Get the selected faculty array
+                e.preventDefault(); // Prevent default form submission
+
                 var formData = new FormData(this); // Get the form data
-                formData.append('selectedFaculties', JSON.stringify(selectedFaculties)); // Append the selected faculties array to formData
+                var workType = $("#workType").val(); // Get the selected work type
+
+                // Clear any previously appended data
+                formData.delete("researchType");
+                formData.delete("teachingSubject");
+                formData.delete("department_data");
+                formData.delete("faculty_data");
+
+                // ✅ Conditional Data Appending Based on Work Type
+                if (workType === "Management") {
+                    formData.append("researchType", $("#researchType").val());
+                    formData.append("teachingSubject", null);
+                    formData.append("selectedDepartments", null);
+                    formData.append("selectedFaculties", null);
+                } else if (workType === "center of head") {
+                    formData.append("researchType", null);
+                    formData.append("teachingSubject", $("#teachingSubject").val());
+                    formData.append("selectedDepartments", null);
+                    formData.append("selectedFaculties", null);
+                } else if (workType === "hod") {
+                    formData.append("researchType", null);
+                    formData.append("teachingSubject", null);
+                    formData.append("selectedDepartments", $("#selectedDepartments").val());
+                    formData.append("selectedFaculties", null);
+                } else if (workType === "faculty") {
+                    formData.append("researchType", null);
+                    formData.append("teachingSubject", null);
+                    formData.append("selectedDepartments", $("#selectedDepartments").val());
+                    formData.append("selectedFaculties", $("#selectedFaculties").val());
+                }
+
+                // 🚀 AJAX Request
                 $.ajax({
                     type: "POST",
-                    url: "/add/addtask", // Your endpoint
+                    url: "/add/addtask", // Your API endpoint
                     data: formData,
-                    processData: false, // Don't process data
-                    contentType: false, // Don't set content type
+                    processData: false, // Don't process data automatically
+                    contentType: false, // Let the browser set content type
                     success: function(response) {
                         if (response.status === 200) {
-                            alertify.success("Task added successfully!");
+                            alertify.success(" Task added successfully!");
+
+                            // Reset form fields
                             $("#addtaskform")[0].reset();
                             $("#addtaskform").find("#hod-departments-btn").text("Select");
                             $("#addtaskform").find("#faculty-departments-btn").text("Select");
                             $("#addtaskform").find("#department-faculty-btn").text("Select");
+
+                            // Hide the modal after submission
                             $("#addtask").modal("hide");
-                            // Reset the form fields
+
+                            // 🔄 Refresh specific sections
                             $('#assignedtask1').load(location.href + ' #assignedtask1');
                             $('#mytask1').load(location.href + ' #mytask1');
                             $('#mytask2').load(location.href + ' #mytask2');
@@ -1450,172 +1628,14 @@
                             $('#completed1').load(location.href + ' #completed1');
                             $('#completed2').load(location.href + ' #completed2');
                         } else {
-                            alertify.error("Something went wrong. Please try again.");
+                            alertify.error(" Something went wrong. Please try again.");
                         }
                     },
                     error: function(xhr, status, error) {
-                        alertify.error("An error occurred. Please try again.");
-                        console.error(error);
+                        alertify.error(" An error occurred. Please try again.");
+                        console.error("Error details:", error); // Debugging info
                     }
                 });
-            });
-
-            const facultyData = @json($deptfaculty); // Assuming $deptfaculty contains all faculty data with department info
-            function toggleDrop(dropdownId, buttonId) {
-                const dropdown = document.getElementById(dropdownId);
-                const isVisible = dropdown.style.display === 'block';
-                dropdown.style.display = isVisible ? 'none' : 'block';
-                document.addEventListener('click', (event) => {
-                    if (!document.getElementById(buttonId).contains(event.target)) {
-                        dropdown.style.display = 'none';
-                    }
-                }, {
-                    once: true
-                });
-            }
-
-            function filterFacultyByDepartments() {
-                const selectedDepartments = [...document.querySelectorAll('input[name="faculty-dname[]"]:checked')].map(cb => cb.value);
-                const facultyDropdown = document.getElementById('departments-faculty-dropdown');
-                facultyDropdown.innerHTML = ''; // Clear existing options
-
-                // Add the "Select All" checkbox label
-                const selectAllLabel = document.createElement('label');
-                const selectAllCheckbox = document.createElement('input');
-                selectAllCheckbox.type = 'checkbox';
-                selectAllCheckbox.id = 'select-all-faculty'; // Unique ID for the "Select All" checkbox
-                selectAllCheckbox.addEventListener('change', function() {
-                    const checkboxes = document.querySelectorAll('.department-faculty-checkbox');
-                    checkboxes.forEach(checkbox => checkbox.checked = this.checked); // Select or deselect all
-                });
-
-                selectAllLabel.appendChild(selectAllCheckbox);
-                selectAllLabel.appendChild(document.createTextNode(' All'));
-                facultyDropdown.appendChild(selectAllLabel);
-                facultyDropdown.appendChild(document.createElement('br'));
-
-                // Filter and add faculty checkboxes
-                const filteredFaculty = facultyData.filter(faculty => selectedDepartments.includes(faculty.dept));
-                filteredFaculty.forEach(faculty => {
-                    const label = document.createElement('label');
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.name = 'facultyname[]';
-                    checkbox.classList.add('department-faculty-checkbox');
-                    checkbox.value = faculty.id;
-
-                    label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(` ${faculty.name} ${faculty.id} (${faculty.dept})`));
-                    facultyDropdown.appendChild(label);
-                    facultyDropdown.appendChild(document.createElement('br'));
-                });
-            }
-
-            document.querySelectorAll('input[name="faculty-dname[]"]').forEach(checkbox => {
-                checkbox.addEventListener('change', filterFacultyByDepartments);
-            });
-
-            document.getElementById('faculty-selectAll').addEventListener('change', (event) => {
-                const checkboxes = document.querySelectorAll('input[name="faculty-dname[]"]');
-                checkboxes.forEach(cb => cb.checked = event.target.checked);
-                filterFacultyByDepartments();
-            });
-
-            function getSelectedFaculties() {
-                var selectedFaculties = []; // Initialize an empty array to store selected faculty
-
-                // Iterate over the checked checkboxes and store the faculty values in the array
-                $('input[name="facultyname[]"]:checked').each(function() {
-                    selectedFaculties.push($(this).val()); // Push the faculty value (ID or name) to the array
-                });
-
-                // Return the array of selected faculties
-                return selectedFaculties;
-            }
-            // Forward Task Selection
-            function toggleForwardTaskSelection() {
-                const type = document.getElementById('forwardtype').value;
-                document.getElementById('forward-hod-section').style.display = type === 'hod' ? 'block' : 'none';
-                document.getElementById('forward-faculty-section').style.display = type === 'faculty' ? 'block' : 'none';
-            }
-
-            // Common function for toggling dropdown visibility for forward task
-            function toggleForwardTaskDropdown(dropdownId, buttonId) {
-                const dropdown = document.getElementById(dropdownId);
-                const button = document.getElementById(buttonId);
-                const isVisible = dropdown.style.display === 'block';
-                dropdown.style.display = isVisible ? 'none' : 'block';
-                button.setAttribute('aria-expanded', !isVisible);
-            }
-
-            // Common function for updating button text based on selected items for forward task
-            function updateForwardTaskButtonText(dropdownId, buttonId, checkboxClass) {
-                const selectedCheckboxes = Array.from(document.querySelectorAll(`.${checkboxClass}:checked`))
-                    .map(checkbox => checkbox.parentElement.textContent.trim());
-                const button = document.getElementById(buttonId);
-                if (selectedCheckboxes.length === 0) {
-                    button.textContent = 'Select';
-                } else if (selectedCheckboxes.length <= 2) {
-                    button.textContent = selectedCheckboxes.join(', ');
-                } else {
-                    button.textContent = `${selectedCheckboxes.length} selected`;
-                }
-            }
-
-            // Common function for handling "Select All" and individual checkboxes for forward task
-            function handleForwardTaskCheckboxSelection(selectAllId, checkboxClass, buttonId) {
-                const selectAll = document.getElementById(selectAllId);
-                const checkboxes = document.querySelectorAll(`.${checkboxClass}`);
-
-                // Update all checkboxes when "Select All" is checked/unchecked
-                selectAll.addEventListener('change', function() {
-                    checkboxes.forEach(checkbox => checkbox.checked = selectAll.checked);
-                    updateForwardTaskButtonText(selectAllId, buttonId, checkboxClass);
-                });
-
-                // Update "Select All" and button text when individual checkboxes are changed
-                checkboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', function() {
-                        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-                        selectAll.checked = allChecked;
-                        updateForwardTaskButtonText(selectAllId, buttonId, checkboxClass);
-                    });
-                });
-            }
-
-            // Initialize dropdowns for both HOD and Faculty sections for forward task
-            document.addEventListener('DOMContentLoaded', function() {
-                // Initialize HOD Section Dropdown for forward task
-                handleForwardTaskCheckboxSelection('forward-hod-selectAll', 'forward-hod-checkbox-item', 'forward-hod-departments-btn');
-
-                // Initialize Faculty Section Dropdown for forward task
-                handleForwardTaskCheckboxSelection('forward-faculty-selectAll', 'forward-faculty-checkbox-item', 'forward-faculty-departments-btn');
-
-                // Close dropdowns when clicking outside for forward task
-                window.addEventListener('click', function(event) {
-                    const hodDropdown = document.getElementById('forward-hod-departments-dropdown');
-                    const facultyDropdown = document.getElementById('forward-faculty-departments-dropdown');
-                    if (!hodDropdown.contains(event.target) && event.target.id !== 'forward-hod-departments-btn') {
-                        hodDropdown.style.display = 'none';
-                    }
-                    if (!facultyDropdown.contains(event.target) && event.target.id !== 'forward-faculty-departments-btn') {
-                        facultyDropdown.style.display = 'none';
-                    }
-                });
-
-                // Close dropdowns on 'Escape' key press for forward task
-                window.addEventListener('keydown', function(event) {
-                    if (event.key === 'Escape') {
-                        document.getElementById('forward-hod-departments-dropdown').style.display = 'none';
-                        document.getElementById('forward-faculty-departments-dropdown').style.display = 'none';
-                    }
-                });
-            });
-
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape') {
-                    dropdown.style.display = 'none';
-                }
             });
             $(document).on('click', '.showImage', function() {
                 // Get the task_id and status from the button's data attributes
@@ -1639,10 +1659,10 @@
             $(document).on('submit', '#forwardform', function(e) {
                 e.preventDefault(); // Prevent form submission
 
-                var selectedFaculties = getSelectedFacultiesForForwardTask(); // Get the selected faculty array
+                // Get the selected faculty array
 
                 var formData = new FormData(this); // Get the form data
-                formData.append('selectedFaculties', JSON.stringify(selectedFaculties)); // Append the selected faculties array to formData
+                // Append the selected faculties array to formData
 
                 $.ajax({
                     type: "POST",
@@ -1672,64 +1692,6 @@
                 });
             });
 
-            const facultyDataForForwardTask = @json($deptfaculty); // Assuming $deptfaculty contains all faculty data with department info
-
-            function toggleForwardTaskDrop(dropdownId, buttonId) {
-                const dropdown = document.getElementById(dropdownId);
-                const isVisible = dropdown.style.display === 'block';
-                dropdown.style.display = isVisible ? 'none' : 'block';
-
-                document.addEventListener('click', (event) => {
-                    if (!document.getElementById(buttonId).contains(event.target)) {
-                        dropdown.style.display = 'none';
-                    }
-                }, {
-                    once: true
-                });
-            }
-
-            function filterForwardTaskFacultyByDepartments() {
-                const selectedDepartments = [...document.querySelectorAll('input[name="forward-faculty-dname[]"]:checked')].map(cb => cb.value);
-                const facultyDropdown = document.getElementById('forward-departments-faculty-dropdown');
-                facultyDropdown.innerHTML = ''; // Clear existing options
-
-                const filteredFaculty = facultyDataForForwardTask.filter(faculty => selectedDepartments.includes(faculty.dept));
-                filteredFaculty.forEach(faculty => {
-                    const label = document.createElement('label');
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.name = 'facultyname[]';
-                    checkbox.value = faculty.id; // Assuming 'name' is the faculty name
-
-                    label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(` ${faculty.name} ${faculty.id} (${faculty.dept})`));
-                    facultyDropdown.appendChild(label);
-                    facultyDropdown.appendChild(document.createElement('br'));
-                });
-            }
-
-            document.querySelectorAll('input[name="forward-faculty-dname[]"]').forEach(checkbox => {
-                checkbox.addEventListener('change', filterForwardTaskFacultyByDepartments);
-            });
-
-            document.getElementById('forward-faculty-selectAll').addEventListener('change', (event) => {
-                const checkboxes = document.querySelectorAll('input[name="forward-faculty-dname[]"]');
-                checkboxes.forEach(cb => cb.checked = event.target.checked);
-                filterForwardTaskFacultyByDepartments();
-            });
-
-            function getSelectedFacultiesForForwardTask() {
-                var selectedFaculties = []; // Initialize an empty array to store selected faculty
-
-                // Iterate over the checked checkboxes and store the faculty values in the array
-                $('input[name="facultyname[]"]:checked').each(function() {
-                    selectedFaculties.push($(this).val()); // Push the faculty value (ID or name) to the array
-                });
-
-                // Return the array of selected faculties
-                return selectedFaculties;
-            }
-
             $(document).on('click', '.showAssignedFaculty', function(e) {
                 e.preventDefault();
 
@@ -1754,6 +1716,7 @@
             });
 
             // Function to fetch task details
+            // Function to fetch task details
             function handleTaskDetails(taskId) {
                 $.ajax({
                     type: 'POST',
@@ -1762,70 +1725,83 @@
                         if (response.status === 200 && response.data.length > 0) {
                             let taskDetails = '';
                             let updata = response.updata;
+                            let reasons = response.reason;
                             let deadline = updata[0].deadline.split("T")[0];
                             let assigned_date = updata[0].assigned_date.split("T")[0];
 
                             $('#forwardfacultyDetailsHeader').html(`
-                                <div class="deadline-header">
-                                    <strong id="assignedDate">Assigned Date:</strong> ${assigned_date}
-                                    &emsp;&emsp;
-                                    <strong id="deadlineDate">Deadline:</strong> ${deadline}
-                                    <br>
-                                </div>
-                            `);
+                    <div class="deadline-header">
+                        <strong id="assignedDate">Assigned Date:</strong> ${assigned_date}
+                        &emsp;&emsp;
+                        <strong id="deadlineDate">Deadline:</strong> ${deadline}
+                        <br>
+                    </div>
+                `);
 
-                            const currentTime = new Date();
-                            const csrfToken = $('meta[name="csrf-token"]').attr("content");
+                            const currentDate = new Date();
 
                             response.data.forEach((task, index) => {
-                                let assignedTime = new Date(task.assigned_date);
-                                let hoursDiff = (currentTime - assignedTime) / (1000 * 60 *
-                                    60); // Convert ms to hours
-                                let isDisabled = task.status != 0 || hoursDiff >= 48;
+                                let assignedDate = new Date(task.assigned_date);
+                                let timeDiff = currentDate - assignedDate;
+                                let hourDiff = timeDiff / (1000 * 60 * 60); // Convert ms to hours
+                                let isDisabled = task.status !== 0 || hourDiff >=
+                                    48; // Disable if status is 1,2,3 or 48 hours passed
 
                                 let formattedCompletedDate = task.completed_date ?
                                     new Date(task.completed_date).toLocaleDateString('en-GB') :
                                     'N/A';
+                                let hasReason = reasons.some(reason => reason.task_id === task.id);
+                                let reasonExist = task.reason !== null && task.status === 0;
 
                                 taskDetails += `
-                                    <tr>
-                                        <td>${index + 1}</td>
-                                        <td>${task.assigned_to_name}</td>
-                                        <td>
-                                            <span class="badge ${task.status === 3 ? 'bg-success' : 'bg-secondary'}">
-                                                ${task.status === 0 ? 'Submitted' :
-                                                task.status === 2 ? 'Completed' :
-                                                task.status === 3 ? 'Approved' : 'Unknown'}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-success btnapprove" value="${task.id}" title="Approve Task" ${task.status === 3 || task.status === 0 ? 'disabled' : ''}>
-                                                <i class="fas fa-circle-check"></i>
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${task.assigned_to_name}</td>
+                            <td>
+                                <span class="badge ${task.status === 3 ? 'bg-success' : 'bg-secondary'}">
+                                    ${task.status === 0 ? 'Assigned' :
+                                    task.status === 1 ? 'Accepted' :
+                                    task.status === 2 ? 'Completed' :
+                                    task.status === 3 ? 'Approved' : 'Unknown'}
+                                </span>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-success btnapprove" value="${task.id}" title="Approve Task" ${task.status === 3 || task.status === 0 ? 'disabled' : ''}>
+                                    <i class="fas fa-circle-check"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btnredo" value="${task.id}" title="Redo Task" ${task.status === 3 || task.status === 0 ? 'disabled' : ''}>
+                                    <i class="fas fa-arrows-rotate"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary btnreassign" data-id="${task.id}" value="${task.id}" data-status="${task.status}" title="Reassign Task" ${isDisabled ||task.status===1||task.status===2||task.status===3 ? 'disabled' : ''}>
+                                    <i class="fa-solid fa-arrows-turn-to-dots"></i>
+                                </button>
+                                <button type="button" class="btn btn-secondary btnedeadline" data-id="${task.id}"value ="${task.id}" data-status="${task.status}" title="Extend deadline">
+                                                <i class="fa-solid fa-calendar-week"></i>
                                             </button>
-                                            <button type="button" class="btn btn-danger btnredo" value="${task.id}" title="Redo Task" ${task.status === 3 || task.status === 0 ? 'disabled' : ''}>
-                                                <i class="fas fa-arrows-rotate"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-primary btnreassign" data-id="${task.id}"value ="${task.id}" data-status="${task.status}" title="Reassign Task" ${isDisabled ? 'disabled' : ''}>
-                                                <i class="fa-solid fa-arrows-turn-to-dots"></i>
-                                            </button>
-                                        </td>
-                                        <td>${formattedCompletedDate}</td>
-                                    </tr>`;
-                                // If the button should be disabled, update the database
-                                if (isDisabled) {
+                                ${reasonExist ? `
+                                <button type="button" class="btn btn-secondary btnreason" data-id="${task.id}" value="${task.id}" data-status="${task.status}" title="Reason">
+                                    <i class="fas fa-light fa-message"></i>
+                                </button>` : ''}
+                            </td>
+                            <td>${formattedCompletedDate}</td>
+                        </tr>`;
+
+                                // If the button should be disabled due to time constraint, update the database
+                                if (hourDiff >= 48 && task.status === 0) {
                                     $.ajax({
                                         url: `/tasks/update-status/${task.id}`,
                                         type: "POST",
                                         data: {
                                             _token: csrfToken,
-                                            status: status,
+                                            status: 1, // Change status to 1 (Accepted)
                                         },
                                         success: function(response) {
-                                            console.log(`Task ${task.id} status updated to 1`);
+                                            console.log(`Task ${task.id} status updated to 1 due to time limit.`);
                                         }
                                     });
                                 }
                             });
+
                             $('#taskDetails').html(taskDetails); // Populate table
                         } else {
                             alert(response.message || 'No task details found.');
@@ -2086,7 +2062,8 @@
                             let updata = response.updata;
                             console.log(updata);
                             let deadline = updata[0].deadline.split("T")[0];
-                            let forwarded_date = updata[0].forwarded_date.split("T")[0]; // Assume deadline is the same for all tasks
+                            let forwarded_date = updata[0].forwarded_date.split("T")[
+                                0]; // Assume deadline is the same for all tasks
 
                             // Display the deadline at the top
                             $('#forwardassignedDetailsHeader').html(`
@@ -2303,7 +2280,8 @@
                             let updata = response.updata;
                             console.log(updata);
                             let deadline = updata[0].deadline.split("T")[0];
-                            let assigned_date = updata[0].assigned_date.split("T")[0]; // Assume deadline is the same for all tasks
+                            let assigned_date = updata[0].assigned_date.split("T")[
+                                0]; // Assume deadline is the same for all tasks
 
                             // Display the deadline at the top
                             $('#cassignedDetailsHeader').html(`
@@ -2396,7 +2374,6 @@
                             $("#reassignForm")[0].reset();
                             $('#reassignModal').modal('hide');
                             $('#viewDetails').modal('hide');
-
                         } else {
                             alertify.error(response.message || 'Failed to reassign the task.');
                         }
@@ -2447,6 +2424,395 @@
                     }
                 });
             });
+            // $(document).on('click', '.btnedeadline', function(e) {
+            //     e.preventDefault();
+            //     var taskId = $(this).val();
+            //     $('#extendDeadlineModal').find('#extenddeadlinetaskId').val(taskId);
+            //     $('#extendDeadlineModal').modal('show');
+            // });
+            $(document).on('click', '.btnedeadline', function(e) {
+                e.preventDefault();
+                let taskId = $(this).data("id");
+                console.log(taskId);
+                $.ajax({
+                    url: `/task/${taskId}`,
+                    type: "GET",
+                    success: function(response) {
+                        $("#oldDeadline").val(response.deadline);
+                        $("#reason").val(response.feedback);
+                        $("#extenddeadlinetaskId").val(taskId);
+                        $("#extendDeadlineModal").modal("show");
+                    }
+                });
+            });
+            $(document).on("submit", "#extendDeadlineForm", function(e) {
+                e.preventDefault();
+                let taskId = $("#extenddeadlinetaskId").val();
+                let oldDeadline = $("#oldDeadline").val();
+                let newDeadline = $("#newDeadline").val();
+                let reason = $("#reason").val();
+
+                let feedback = newDeadline && newDeadline > oldDeadline ? reason : null;
+                let status = 1;
+                if (newDeadline && newDeadline > oldDeadline) {
+                    status = 4;
+                }
+                let deadline = newDeadline ? newDeadline : oldDeadline;
+
+                $.ajax({
+                    url: "/update-deadline",
+                    type: "POST",
+                    data: {
+                        task_id: taskId,
+                        deadline: deadline,
+                        feedback: feedback,
+                        status: status,
+                        _token: $('meta[name="csrf-token"]').attr("content"), // CSRF token
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alertify.success("Deadline updated successfully!");
+                            $("#extendDeadlineModal").modal("hide"); // Close modal
+
+                        } else {
+                            alertify.error("Failed to update deadline!");
+                        }
+                    },
+                    error: function(xhr) {
+                        alert("Error: " + xhr.responseJSON.error);
+                    },
+                });
+            });
+            //Reason display for assigned tab
+            $(document).on('click', '.btnreason', function() {
+                let taskId = $(this).data('id'); // Get task ID from button
+
+                $.ajax({
+                    type: 'POST',
+                    url: `/user/fetchdet/${taskId}`, // Fetch reason from backend
+                    success: function(response) {
+                        if (response.status === 200 && response.reason.length > 0) {
+                            let reasonText = response.reason[0].reason; // Get first reason
+
+                            $('#reasonDisplayText').text(reasonText); // Display reason in modal
+                            $('#forwardtaskId').val(taskId); // Set hidden input value
+
+                            $('#reasonDisplayModal').modal('show'); // Open modal
+                        } else {
+                            alertify.error('No reason found for this task.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching reason:', error);
+                        alertify.error('An error occurred while fetching the reason.');
+                    }
+                });
+            });
+
+            //Reason for mytask tab
+            $(document).on('click', '.btnmyreason', function() {
+                var taskId = $(this).val(); // Get task_id from button value
+
+                // Make an AJAX request to fetch the reason
+                $.ajax({
+                    url: '/fetch-reason/' + taskId, // The route to fetch reason
+                    type: 'GET',
+                    success: function(response) {
+                        // Check if the task exists
+                        if (response.tasks.length > 0) {
+                            var reasonText = '';
+                            // Loop through the tasks and find the reason
+                            response.tasks.forEach(function(task) {
+                                if (task.task_id == taskId) {
+                                    reasonText = task.reason;
+                                }
+                            });
+
+                            // Populate the modal with the reason
+                            $('#reasonDisplayText').text(reasonText);
+                            $('#task_id').val(taskId); // Set the task_id in the hidden input field
+
+                            // Open the modal
+                            $('#reasonDisplayModal').modal('show');
+                        } else {
+                            alert('No reason found for this task.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("There was an error fetching the reason: ", error);
+                        alert('Unable to fetch the reason. Please try again.');
+                    }
+                });
+            });
+
+            //extend deadline my-task
+            $(document).on('click', '.btnextend', function() {
+                var taskId = $(this).val(); // Get task_id from button value
+
+                $('#task_id').val(taskId); // Set task ID in hidden field
+                $('#reasonInput').val(''); // Clear previous reason
+                $('#requestdeadlineModal').modal('show'); // Show modal
+            });
+
+            // Handle form submission
+            $('#extndDeadlineForm').submit(function(e) {
+                e.preventDefault();
+
+                var taskId = $('#task_id').val();
+                var reason = $('#reasonInput').val();
+                var button = $('.btnextend[value="' + taskId + '"]'); // Select the button using task ID
+
+                $.ajax({
+                    url: '/save-feedback',
+                    type: 'POST',
+                    data: {
+                        task_id: taskId,
+                        reason: reason, // Get reason value from input field
+                        _token: $('meta[name="csrf-token"]').attr('content') // Include CSRF token
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alertify.success("Deadline requested successfully!");
+                            $("#requestdeadlineModal").modal("hide");
+                            $('#extndDeadlineForm')[0].reset();
+                            button.prop('disabled', true); // Close modal
+
+                        } else {
+                            alertify.error("Failed to request deadline!");
+                        }
+                    },
+                    error: function(xhr) {
+                        alert("Error: " + xhr.responseJSON.error);
+                    },
+
+                });
+            });
+
+            // NEW ADD TASK
+            function showDropdown() {
+                let workType = document.getElementById("workType").value;
+
+                document.getElementById("managementDropdown").style.display = "none";
+                document.getElementById("cohDropdown").style.display = "none";
+                document.getElementById("departmentDropdown").style.display = "none";
+                document.getElementById("facultyDropdown").style.display = "none";
+
+                if (workType === "Management") {
+                    document.getElementById("managementDropdown").style.display = "block";
+                } else if (workType === "center of head") {
+                    document.getElementById("cohDropdown").style.display = "block";
+                } else if (workType === "hod" || workType === "faculty") {
+                    document.getElementById("departmentDropdown").style.display = "block";
+                    if (workType === "faculty") {
+                        document.getElementById("facultyDropdown").style.display = "block";
+                    }
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                const deptDropdownBtn = document.getElementById("deptDropdownBtn");
+                const deptDropdownList = document.getElementById("deptDropdownList");
+                const facultyDropdownBtn = document.getElementById("facultyDropdownBtn");
+                const facultyDropdownList = document.getElementById("facultyDropdownList");
+
+                function updateSelectedDepartments() {
+                    const selected = Array.from(document.querySelectorAll(".dept-checkbox:checked")).map(cb => cb.value);
+                    let displayText = selected.length > 2 ? `${selected.length} selected` : selected.join(", ");
+
+                    if (displayText.length > 60) displayText = displayText.substring(0, 60) + "...";
+                    deptDropdownBtn.innerText = displayText || "Select Department";
+                    document.getElementById("selectedDepartments").value = selected.join(",");
+
+                    if (selected.length > 0) fetchFaculties(selected);
+                }
+
+                function fetchFaculties(departments) {
+                    let workType = document.getElementById("workType").value;
+                    if (workType !== "faculty") {
+                        return;
+                    }
+                    fetch(`/getFaculties?departments=${encodeURIComponent(departments.join(","))}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            facultyDropdownList.innerHTML = data.length ?
+                                data.map(faculty =>
+                                    `<li><label><input type="checkbox" class="faculty-checkbox" value="${faculty.id}">${faculty.name} (${faculty.dept})</label></li>`
+                                ).join("") :
+                                "<li>No faculties found</li>";
+                        })
+                        .catch(error => console.error("Error fetching faculties:", error));
+                }
+
+                function updateSelectedFaculties() {
+                    let workType = document.getElementById("workType").value;
+                    if (workType !== "faculty") {
+                        return;
+                    }
+
+                    const selectedFaculties = Array.from(document.querySelectorAll('.faculty-checkbox:checked')).map(cb => cb
+                        .value);
+                    const selectedFacultyNames = Array.from(document.querySelectorAll('.faculty-checkbox:checked')).map(cb => cb
+                        .parentElement.textContent.trim());
+
+                    // Display logic: if more than 2 selected, show count; otherwise, show names
+                    let displayText = selectedFaculties.length > 1 ?
+                        `${selectedFaculties.length} selected` :
+                        selectedFacultyNames.join(", ");
+
+                    // Limit display text to 60 characters for better UI
+                    if (displayText.length > 60) {
+                        displayText = displayText.substring(0, 60) + "...";
+                    }
+
+                    facultyDropdownBtn.innerText = displayText || "Select Faculty";
+                    document.getElementById("selectedFaculties").value = selectedFaculties.join(",");
+                }
+
+
+                deptDropdownBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    deptDropdownList.style.display = deptDropdownList.style.display === "block" ? "none" : "block";
+                });
+
+                facultyDropdownBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    facultyDropdownList.style.display = facultyDropdownList.style.display === "block" ? "none" : "block";
+                });
+
+                document.addEventListener("click", (e) => {
+
+                    if (!deptDropdownBtn.contains(e.target)) deptDropdownList.style.display = "none";
+                    if (!facultyDropdownBtn.contains(e.target)) facultyDropdownList.style.display = "none";
+                });
+
+                document.querySelectorAll(".dept-checkbox").forEach(checkbox => {
+                    checkbox.addEventListener("change", updateSelectedDepartments);
+                });
+                deptDropdownList.addEventListener("click", (e) => e.stopPropagation());
+                facultyDropdownList.addEventListener("click", (e) => e.stopPropagation());
+
+                document.addEventListener("change", (e) => {
+                    if (e.target.classList.contains("faculty-checkbox")) {
+                        updateSelectedFaculties();
+                    }
+                });
+            });
+
+            $(document).on('click', '.btnedeadline', function(e) {
+                e.preventDefault();
+                let taskId = $(this).data("id");
+                console.log(taskId);
+                $.ajax({
+                    url: `/task/${taskId}`,
+                    type: "GET",
+                    success: function(response) {
+                        $("#oldDeadline").val(response.deadline);
+                        $("#reason").val(response.feedback);
+                        $("#extenddeadlinetaskId").val(taskId);
+                        $("#extendDeadlineModal").modal("show");
+                    }
+                });
+            });
+            $(document).on("submit", "#extendDeadlineForm", function(e) {
+                e.preventDefault(); // Prevent page refresh
+                let taskId = $("#extenddeadlinetaskId").val();
+                let oldDeadline = $("#oldDeadline").val();
+                let newDeadline = $("#newDeadline").val();
+                let reason = $("#reason").val();
+                // Converts back to "YYYY-MM-DD"
+
+
+                // Determine values for feedback and deadline
+                let feedback = reason;
+                let status = 1;
+                let deadline = oldDeadline;
+                let oldDate = new Date(oldDeadline);
+                let newDate = new Date(newDeadline);
+
+                // Extract only the year, month, and day
+                let oldDateOnly = new Date(oldDate.getFullYear(), oldDate.getMonth(), oldDate.getDate());
+                let newDateOnly = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate());
+
+                // Compare only the date part (ignoring time)
+                if (newDateOnly > oldDateOnly) {
+                    status = 4;
+                    deadline = newDeadline;
+                }
+
+
+
+                $.ajax({
+                    url: "/update-deadline",
+                    type: "POST",
+                    data: {
+                        task_id: taskId,
+                        deadline: deadline,
+                        feedback: feedback,
+                        status: status,
+                        _token: $('meta[name="csrf-token"]').attr("content"), // Include CSRF token
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alertify.success("Deadline updated successfully!");
+                            $("#extendDeadlineModal").modal("hide"); // Close modal
+                        } else {
+                            alertify.error("Failed to update deadline!");
+                        }
+                    },
+                    error: function(xhr) {
+                        alert("Error: " + xhr.responseJSON.error);
+                    },
+                });
+            });
+
+            function updateSelecteddepartmentFaculties() {
+                const selectedIds = [];
+                const selectedNames = [];
+
+                document.querySelectorAll('.deptfaculty-checkbox:checked').forEach(checkbox => {
+                    selectedIds.push(checkbox.value); // Store ID
+                    selectedNames.push(checkbox.parentNode.textContent.trim()); // Store name
+                });
+
+                const button = document.getElementById('newFacultyBtn');
+                if (selectedNames.length === 0) {
+                    button.innerText = 'Select Faculty';
+                } else if (selectedNames.length <= 2) {
+                    button.innerText = selectedNames.join(', ');
+                } else {
+                    button.innerText = `${selectedNames.length} selected`;
+                }
+
+                document.getElementById('selecteddeptFaculties').value = selectedIds.join(', '); // Store IDs
+            }
+
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                });
+            });
+
+            function updateSelectedforwarddepartmentFaculties() {
+                const selectedIds = [];
+                const selectedNames = [];
+
+                document.querySelectorAll('.fdeptfaculty-checkbox:checked').forEach(checkbox => {
+                    selectedIds.push(checkbox.value); // Store selected faculty IDs
+                    selectedNames.push(checkbox.parentNode.textContent.trim()); // Store selected faculty names
+                });
+
+                const button = document.getElementById('fnewFacultyBtn');
+
+                if (selectedNames.length === 0) {
+                    button.innerText = 'Select Faculty';
+                } else if (selectedNames.length <= 2) {
+                    button.innerText = selectedNames.join(', ');
+                } else {
+                    button.innerText = `${selectedNames.length} selected`;
+                }
+
+                document.getElementById('selectedforwarddeptFaculties').value = selectedIds.join(', '); // Store selected IDs
+            }
         </script>
 </body>
 
