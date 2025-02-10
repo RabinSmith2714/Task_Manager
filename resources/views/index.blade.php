@@ -295,6 +295,8 @@
                                     <form id="addtaskform" enctype="multipart/form-data">
                                         <input type="hidden" id="hidden_faculty_id" value="{{$facultyId}}" name="faculty_id">
                                         <input type="hidden" id="hidden_faculty_name" value="{{$facultyName}}" name="faculty_name">
+                                        <input type="hidden" id="Role" value="{{$Role}}" name="Role">
+                                        <input type="hidden" id="specialStatus" value="{{$specialStatus}}" name="specialStatus">
                                         @if($specialStatus == 0 && $Role == 'Principal')
 
                                         <div class="mb-3">
@@ -391,11 +393,7 @@
                                             </ul>
                                             <input type="hidden" name="selecteddeptFaculties" id="selecteddeptFaculties">
                                         </div>
-
                                         @endif
-
-
-
                                         <div class="mb-3">
                                             <label for="title" class="form-label">Title</label>
                                             <input class="form-control" type="text" id="title" name="title" placeholder="Enter Title"
@@ -616,6 +614,26 @@
                                             </ul>
                                             <input type="hidden" name="selectedforwarddeptFaculties" id="selectedforwarddeptFaculties">
                                         </div>
+
+                                        @elseif($specialStatus == 2 && $Type == 'center of heads')
+                                        <div class="mb-3">
+                                            <label for="coordinators" class="form-label">Select Faculty</label>
+                                            <button type="button" class="form-control text-start dropdown-toggle" data-bs-toggle="dropdown"
+                                                id="coordinatorBtn">Select</button>
+                                            <ul class="dropdown-menu" id="coordinatorDropdown">
+                                                @foreach($coordinators as $c)
+                                                <li>
+                                                    <label class="dropdown-item">
+                                                        <input type="checkbox" class="coordinator-checkbox" value="{{ $c->id }}"
+                                                            onchange="updateSelectedcoordinators()">
+                                                        {{ $c->name }}
+                                                    </label>
+                                                </li>
+                                                @endforeach
+                                            </ul>
+                                            <input type="hidden" name="selectedcoordinators" id="selectedcoordinators">
+                                        </div>
+
 
                                         @endif
                                         <div class="mb-3">
@@ -1627,6 +1645,10 @@
                             $('#overdue1').load(location.href + ' #overdue1');
                             $('#completed1').load(location.href + ' #completed1');
                             $('#completed2').load(location.href + ' #completed2');
+                        } else if (response.status == 500) {
+                            alertify.error("ulla varala da");
+                        } else if (response.status == 400) {
+                            alertify.error("400");
                         } else {
                             alertify.error(" Something went wrong. Please try again.");
                         }
@@ -1685,6 +1707,8 @@
                             // Reset the form fields
                             $('#mytask1').load(location.href + ' #mytask1');
                             $('#mytask2').load(location.href + ' #mytask2');
+                        } else if (response.status === 400) {
+                            alertify.error("data error");
                         } else {
                             alertify.error("Something went wrong. Please try again.");
                         }
@@ -2081,27 +2105,27 @@
                                     new Date(task.completed_date).toLocaleDateString('en-GB') :
                                     'N/A';
                                 forwardfacultyDetails += `
-                                    <tr class="${isDeadline_Crossed ? 'table-danger' : ''}">
-                                        <td>${index + 1}</td>
-                                        <td>${task.assigned_to_name}</td>
-                                        <td>
-                                            <span class="badge ${task.status === 3 ? 'bg-success' : 'bg-secondary'}">
-                                            ${task.status === 0 ? 'Submitted' :
-                                            task.status === 2 ? 'Completed' :
-                                            task.status === 3 ? 'Approved' : 'Unknown'}
-                                            </span>
-                                        </td>
+                <tr class="${isDeadline_Crossed ? 'table-danger' : ''}">
+                <td>${index + 1}</td>
+                <td>${task.assigned_to_name}</td>
+                <td>
+                <span class="badge ${task.status === 3 ? 'bg-success' : 'bg-secondary'}">
+                ${task.status === 0 ? 'Submitted' :
+                task.status === 2 ? 'Completed' :
+                task.status === 3 ? 'Approved' : 'Unknown'}
+                  </span>
+                </td>
 
-                                        <td>
-                                            <button type="button" class="btn btn-success btnforwardapprove" value="${task.sid}" title="Approve Task" ${task.status === 0 || task.status === 3 ? 'disabled' : ''}>
-                                            <i class="fas fa-circle-check"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-danger btnforwardredo" value="${task.sid}" title="Redo Task" ${task.status === 0 || task.status === 3 ? 'disabled' : ''}>
-                                            <i class="fas fa-arrows-rotate"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-primary btnforwardreassign" value="${task.sid}" title="Reassign Task" ${task.status === 1 ? 'disabled' : ''}>
-                                                <i class="fa-solid fa-arrows-turn-to-dots"></i>
-                                            </button>
+                <td>
+                <button type="button" class="btn btn-success btnforwardapprove" value="${task.sid}" title="Approve Task" ${task.status === 0 || task.status === 3 ? 'disabled' : ''}>
+                <i class="fas fa-circle-check"></i>
+                </button>
+                <button type="button" class="btn btn-danger btnforwardredo" value="${task.sid}" title="Redo Task" ${task.status === 0 || task.status === 3 ? 'disabled' : ''}>
+                <i class="fas fa-arrows-rotate"></i>
+                </button>
+                <button type="button" class="btn btn-primary btnforwardreassign" value="${task.sid}" title="Reassign Task" ${task.status === 1 ? 'disabled' : ''}>
+                  <i class="fa-solid fa-arrows-turn-to-dots"></i>
+                </button>
                                         </td>
                                         <td>${formatted_CompletedDate}</td>
                                     </tr>`;
@@ -2619,7 +2643,7 @@
                     const selected = Array.from(document.querySelectorAll(".dept-checkbox:checked")).map(cb => cb.value);
                     let displayText = selected.length > 2 ? `${selected.length} selected` : selected.join(", ");
 
-                    if (displayText.length > 60) displayText = displayText.substring(0, 60) + "...";
+                    if (displayText.length > 55) displayText = displayText.substring(0, 55) + "...";
                     deptDropdownBtn.innerText = displayText || "Select Department";
                     document.getElementById("selectedDepartments").value = selected.join(",");
 
@@ -2659,9 +2683,9 @@
                         `${selectedFaculties.length} selected` :
                         selectedFacultyNames.join(", ");
 
-                    // Limit display text to 60 characters for better UI
-                    if (displayText.length > 60) {
-                        displayText = displayText.substring(0, 60) + "...";
+                    // Limit display text to 55 characters for better UI
+                    if (displayText.length > 55) {
+                        displayText = displayText.substring(0, 55) + "...";
                     }
 
                     facultyDropdownBtn.innerText = displayText || "Select Faculty";
@@ -2783,7 +2807,7 @@
                     button.innerText = `${selectedNames.length} selected`;
                 }
 
-                document.getElementById('selecteddeptFaculties').value = selectedIds.join(', '); // Store IDs
+                document.getElementById('selecteddeptFaculties').value = selectedIds.join(','); // Store IDs
             }
 
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
@@ -2812,6 +2836,30 @@
                 }
 
                 document.getElementById('selectedforwarddeptFaculties').value = selectedIds.join(', '); // Store selected IDs
+            }
+
+            // forward coh 
+            function updateSelectedcoordinators() {
+                let checkboxes = document.querySelectorAll('.coordinator-checkbox:checked');
+                let selectedValues = [];
+                let selectedNames = [];
+
+                checkboxes.forEach((checkbox) => {
+                    selectedValues.push(checkbox.value);
+                    selectedNames.push(checkbox.parentNode.textContent.trim());
+                });
+
+                let button = document.getElementById('coordinatorBtn');
+
+                if (selectedNames.length === 0) {
+                    button.textContent = "Select";
+                } else if (selectedNames.length <= 2) {
+                    button.textContent = selectedNames.join(', ');
+                } else {
+                    button.textContent = selectedNames.length + " Selected";
+                }
+
+                document.getElementById('selectedcoordinators').value = selectedValues.join(',');
             }
         </script>
 </body>

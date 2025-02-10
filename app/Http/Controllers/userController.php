@@ -88,6 +88,7 @@ class userController extends Controller
             $specialStatus = $faculty ? 4 : 3;
         }
         $Role = Specialrole::where('id', $facultyId)->value('Role');
+        $Type = Specialrole::where('id', $facultyId)->value('type');
         if (is_null($Role)) {
             $faculty = Faculty::where('id', $facultyId)
                 ->where('role', 'faculty')
@@ -377,7 +378,12 @@ class userController extends Controller
             ->where('role', 'Faculty')
             ->where('status', '1')
             ->get();
-
+        $coordinators = Specialrole::where('Specialrole.Role', $Role)
+            ->where('Specialrole.type', $Type)
+            ->where('Specialrole.status', 4)
+            ->join('faculty', 'faculty.id', '=', 'specialrole.id')
+            ->select('faculty.id', 'faculty.name', 'faculty.dept')
+            ->get();
 
 
 
@@ -409,7 +415,9 @@ class userController extends Controller
             'centerofheads',
             'Role',
             'departmentfaculties',
-            'studentaffiars'
+            'studentaffiars',
+            'Type',
+            'coordinators'
         ));
     }
 
@@ -421,7 +429,9 @@ class userController extends Controller
             'deadline' => 'required|date|after_or_equal:assigned_date',
         ]);
 
-        $type = $request->input('type');
+        $specialStatus = $request->input('specialStatus');
+        $Role = $request->input('Role');
+        $workType = $request->input('workType');
 
         // Create a single Maintask record
         $maintask = Maintask::create([
@@ -434,132 +444,103 @@ class userController extends Controller
             'deadline' => $request->deadline,
         ]);
 
-        // For HOD role, assign the task to departments
-        if ($type == 'hod') {
-            $selectedHodDepartments = $request->input('hod-dname');
-
-            if (is_array($selectedHodDepartments) && count($selectedHodDepartments) > 0) {
-                $hods = Faculty::whereIn('dept', $selectedHodDepartments)
-                    ->where('role', 'hod')
-                    ->where('status', '1')
-                    ->select('id', 'name')
-                    ->get();
-
-                foreach ($hods as $hod) {
-                    Mainbranch::create([
-                        'task_id' => $maintask->task_id,
-                        'assigned_to_id' => $hod->id,
-                        'assigned_to_name' => $hod->name,
-                        'deadline' => $request->deadline,
-                    ]);
-                }
+        // Principal Condition
+        if ($specialStatus == 0 && $Role == "Principal") {
+            if ($workType == "Management") {
+                $fac1 = $request->input('researchType');
+                $facultyData = Faculty::where('id', '=', $fac1)->value('name');
+                Mainbranch::create([
+                    'task_id' => $maintask->task_id,
+                    'assigned_to_id' => $fac1,
+                    'assigned_to_name' => $facultyData,
+                    'deadline' => $request->deadline,
+                    'status' => '0',
+                ]);
                 return response()->json([
                     'status' => 200,
                 ]);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Please select valid HOD departments.',
+            } else if ($workType == "center of head") {
+                $fac1 = $request->input('teachingSubject');
+                $facultyData = Faculty::where('id', '=', $fac1)->value('name');
+                Mainbranch::create([
+                    'task_id' => $maintask->task_id,
+                    'assigned_to_id' => $fac1,
+                    'assigned_to_name' => $facultyData,
+                    'deadline' => $request->deadline,
+                    'status' => '0',
                 ]);
-            }
-        } else {
-            // For faculty role, assign the task to selected faculties
-            $selectedFaculties = json_decode($request->input('selectedFaculties'));
-
-            if (is_array($selectedFaculties) && count($selectedFaculties) > 0) {
-                $faculties = Faculty::whereIn('id', $selectedFaculties)
-                    ->where('role', 'faculty')
-                    ->select('id', 'name')
-                    ->get();
-
-                foreach ($faculties as $faculty) {
-                    Mainbranch::create([
-                        'task_id' => $maintask->task_id,
-                        'assigned_to_id' => $faculty->id,
-                        'assigned_to_name' => $faculty->name,
-                        'deadline' => $request->deadline,
-                    ]);
-                }
                 return response()->json([
                     'status' => 200,
                 ]);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Please select valid faculty departments.',
-                ]);
-            }
-        }
-    }
+            } else if ($workType == "hod") {
+                $selectedDept = $request->input('selectedDepartments');
+                $selectedDepartments = explode(',', $selectedDept);
 
-    public function forwardtask(Request $request)
-    {
-        $status = $request->input('status');
-        $type = $request->input('forwardtype');
+                if (is_array($selectedDepartments) && count($selectedDepartments) > 0) {
+                    $hods = Faculty::whereIn('dept', $selectedDepartments)
+                        ->where('role', 'hod')
+                        ->where('status', '1')
+                        ->select('id', 'name')
+                        ->get();
 
-        $recipients = [];
-        $forwardtaskDetails = [
-            'task_id' => $request->input('task_id'),
-            'assigned_by_id' => $request->faculty_id,
-            'assigned_by_name' => $request->faculty_name,
-            'status' => $status,
-            'deadline' => $request->forwarddeadline,
-            'forwarded_date' => $request->forwarded_date
-        ];
-
-        if ($type == 'hod') {
-            $selectedHodDepartments = $request->input('forward-hod-dname');
-
-            if (is_array($selectedHodDepartments) && count($selectedHodDepartments) > 0) {
-                $hods = Faculty::whereIn('dept', $selectedHodDepartments)
-                    ->where('role', 'hod')
-                    ->where('status', '1')
-                    ->select('id', 'name')
-                    ->get();
-
-                foreach ($hods as $hod) {
-                    // Insert Subtask data
-                    Subtask::create([
-                        'task_id' => $forwardtaskDetails['task_id'],
-                        'assigned_by_id' => $forwardtaskDetails['assigned_by_id'],
-                        'assigned_by_name' => $forwardtaskDetails['assigned_by_name'],
-                        'assigned_to_id' => $hod->id,
-                        'assigned_to_name' => $hod->name,
-                        'deadline' => $forwardtaskDetails['deadline'],
-                        'status' => $forwardtaskDetails['status'],
-                        'forwarded_date' => $forwardtaskDetails['forwarded_date'],
+                    foreach ($hods as $hod) {
+                        Mainbranch::create([
+                            'task_id' => $maintask->task_id,
+                            'assigned_to_id' => $hod->id,
+                            'assigned_to_name' => $hod->name,
+                            'deadline' => $request->deadline,
+                            'status' => '0',
+                        ]);
+                    }
+                    return response()->json([
+                        'status' => 200,
                     ]);
+                }
+            } else if ($workType == "faculty") {
+                $selectedfac = $request->input('selectedFaculties');
+                $selectedFaculty = explode(',', $selectedfac);
 
+                if (is_array($selectedFaculty) && count($selectedFaculty) > 0) {
+                    $faculties = Faculty::whereIn('id', $selectedFaculty)
+                        ->where('role', 'faculty')
+                        ->select('id', 'name')
+                        ->get();
+
+                    foreach ($faculties as $faculty) {
+                        Mainbranch::create([
+                            'task_id' => $maintask->task_id,
+                            'assigned_to_id' => $faculty->id,
+                            'assigned_to_name' => $faculty->name,
+                            'deadline' => $request->deadline,
+                            'status' => '0',
+                        ]);
+                    }
                     return response()->json([
                         'status' => 200,
                     ]);
                 }
             } else {
                 return response()->json([
-                    'status' => 400,
-                    'message' => 'Please select valid HOD departments.',
+                    'status' => 500,
                 ]);
             }
-        } else {
-            $selectedFaculties = json_decode($request->input('selectedFaculties'));
+        } else if ($specialStatus == 3 && $Role == "head of department") {
+            $selectedfac = $request->input('    ');
+            $selectedFaculty = explode(',', $selectedfac);
 
-            if (is_array($selectedFaculties) && count($selectedFaculties) > 0) {
-                $faculties = Faculty::whereIn('id', $selectedFaculties)
+            if (is_array($selectedFaculty) && count($selectedFaculty) > 0) {
+                $faculties = Faculty::whereIn('id', $selectedFaculty)
                     ->where('role', 'faculty')
                     ->select('id', 'name')
                     ->get();
 
                 foreach ($faculties as $faculty) {
-                    // Insert Subtask data
-                    Subtask::create([
-                        'task_id' => $forwardtaskDetails['task_id'],
-                        'assigned_by_id' => $forwardtaskDetails['assigned_by_id'],
-                        'assigned_by_name' => $forwardtaskDetails['assigned_by_name'],
+                    Mainbranch::create([
+                        'task_id' => $maintask->task_id,
                         'assigned_to_id' => $faculty->id,
                         'assigned_to_name' => $faculty->name,
-                        'deadline' => $forwardtaskDetails['deadline'],
-                        'status' => $forwardtaskDetails['status'],
-                        'forwarded_date' => $forwardtaskDetails['forwarded_date'],
+                        'deadline' => $request->deadline,
+                        'status' => '0',
                     ]);
                 }
                 return response()->json([
@@ -568,17 +549,81 @@ class userController extends Controller
             } else {
                 return response()->json([
                     'status' => 400,
-                    'message' => 'Please select valid faculty members.',
                 ]);
             }
+        } else if ($specialStatus == 1 && $Role == "student affiars") {
+            $studentAff = $request->input('studentaffiars');
+            $facultyData = Faculty::where('id', '=', $studentAff)->value('name');
+            Mainbranch::create([
+                'task_id' => $maintask->task_id,
+                'assigned_to_id' => $studentAff,
+                'assigned_to_name' => $facultyData,
+                'deadline' => $request->deadline,
+                'status' => '0',
+            ]);
+            return response()->json([
+                'status' => 200,
+            ]);
+        } else {
+            return response()->json([
+                'status' => 400,
+            ]);
+        }
+    }
+
+
+
+
+
+    public function forwardtask(Request $request)
+    {
+
+        $type = $request->input('type');
+        if ($type == 'center of heads') {
+            $coordinators = $request->input('selectedcoordinators');
+            $coordinatorfac = explode(',', $coordinators);
+            if (is_array($coordinatorfac) && count($coordinatorfac) > 0) {
+                $data = Faculty::whereIn('id', $coordinatorfac)
+                    ->where('role', 'Faculty')
+                    ->where('status', '1')
+                    ->select('id', 'name')
+                    ->get();
+            } else {
+                return response()->json([
+                    'status' => 400,
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+            ]);
         }
 
-
+        foreach ($data as $facdata) {
+            Subtask::create([
+                'task_id' => $request->input('task_id'),
+                'assigned_by_id' => $request->input('faculty_id'),
+                'assigned_by_name' => $request->input('faculty_name'),
+                'assigned_to_id' => $facdata->id,
+                'assigned_to_name' => $facdata->name,
+                'deadline' => $request->input('forwarddeadline'),
+                'status' => '0',
+                'forwarded_date' => $request->input('forwarded_date'),
+            ]);
+        }
         return response()->json([
             'status' => 200,
             'message' => 'Task Forwarded successfully',
         ]);
     }
+
+
+
+
+
+
+
+
     public function approve($id)
     {
         $task = Mainbranch::findOrFail($id);
@@ -1033,7 +1078,7 @@ class userController extends Controller
     public function ReassignDate(request $request, $id)
     {
         $Redate = Mainbranch::findorFail($id);
-        // $task =$request->status;
+        $task = $request->status;
         if ($task->status == '0') {
             $task->status = '1';
             $task->save();
