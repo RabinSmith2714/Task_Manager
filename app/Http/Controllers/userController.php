@@ -525,7 +525,7 @@ class userController extends Controller
                 ]);
             }
         } else if ($specialStatus == 3 && $Role == "head of department") {
-            $selectedfac = $request->input('    ');
+            $selectedfac = $request->input('selecteddeptFaculties');
             $selectedFaculty = explode(',', $selectedfac);
 
             if (is_array($selectedFaculty) && count($selectedFaculty) > 0) {
@@ -577,8 +577,9 @@ class userController extends Controller
 
     public function forwardtask(Request $request)
     {
-
         $type = $request->input('type');
+        $Role = $request->input('role');
+        
         if ($type == 'center of heads') {
             $coordinators = $request->input('selectedcoordinators');
             $coordinatorfac = explode(',', $coordinators);
@@ -593,9 +594,31 @@ class userController extends Controller
                     'status' => 400,
                 ]);
             }
+        } else if ($Role == 'head of department') {
+            $selectedfac = $request->input('selectedforwarddeptFaculties');
+            $selectedFaculty = explode(',', $selectedfac);
+
+            if (is_array($selectedFaculty) && count($selectedFaculty) > 0) {
+                $data = Faculty::whereIn('id', $selectedFaculty)
+                    ->where('role', 'faculty')
+                    ->select('id', 'name')
+                    ->where('status', '1')
+                    ->get();
+            } else {
+                return response()->json([
+                    'status' => 400,
+                ]);
+            }
+        } else if($Role == 'student affiars'){
+            $coh = $request->input('fstudentaffiars');
+            $data = Faculty::where('id', $coh)
+                    ->where('role', 'faculty')
+                    ->select('id', 'name')
+                    ->where('status', '1')
+                    ->get();
         } else {
             return response()->json([
-                'status' => 400,
+                'status' => 500,
             ]);
         }
 
