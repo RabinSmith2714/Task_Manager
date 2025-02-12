@@ -33,12 +33,14 @@ class userController extends Controller
 
         // Find the user in the Faculty model
         $faculty = Faculty::where('id', $request->faculty_id)->first();
+        $specialrole = specialrole::where('id', $request->faculty_id)->first();
         if ($faculty && $faculty->pass === $request->password) {
             session([
                 'faculty_id' => $faculty->id,
                 'role' => $faculty->role,
                 'faculty_name' => $faculty->name,
                 'department' => $faculty->dept,
+                'specialrole' => $specialrole->dept,
             ]);
 
             return response()->json([
@@ -60,6 +62,7 @@ class userController extends Controller
         $role = session('role');
         $facultyName = session('faculty_name');
         $department = session('department');
+        $specialrole = session('specialrole');
         $dept = Department::all();
         $deptfaculty = Faculty::where('status', '1')->where('id', '!=', $facultyId)->get();
         $assigned_task = Maintask::select('task_id', 'title', 'description', 'deadline')->where('status', 0)->where('assigned_by_id', $facultyId)->groupBy('task_id', 'title', 'description', 'deadline')->get();
@@ -70,6 +73,7 @@ class userController extends Controller
 
         $management =  Specialrole::select('Specialrole.Role', 'Specialrole.id', 'faculty.name')
             ->where('Specialrole.type', 'Management')
+            ->where('specialrole.Role', '!=' ,'Principal',$facultyId)
             ->join('faculty', 'faculty.id', '=', 'specialrole.id')
             ->distinct()
             ->get();

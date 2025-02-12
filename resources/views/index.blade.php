@@ -948,6 +948,8 @@
                 <input type="hidden" id="Reassign_Role" value="{{$Role}}" name="Reassign_Role">
                 <input type="hidden" id="Reassign_specialStatus" value="{{$specialStatus}}"
                   name="Reassign_specialStatus">
+                  <input type="text" id="Reassign_task_id" name="Reassign_task_id">
+
                 @if($specialStatus == 0 && $Role == 'Principal')
 
                 <div class="mb-3">
@@ -955,75 +957,37 @@
                   <select class="form-control" id="Reassign_workType" name="Reassign_workType"
                     onchange="Reassign_showDropdown()" required>
                     <option value="">Select</option>
-                    <option value="Management">Management</option>
-                    <option value="center of head">Center of Head</option>
                     <option value="hod">Head of the Department</option>
                     <option value="faculty">Faculty</option>
                   </select>
                 </div>
-
-                <div class="mb-3" id="Reassign_managementDropdown" style="display: none;">
-                  <label for="researchType" class="form-label">Management</label>
-                  <select class="form-control" id="Reassign_researchType" name="Reassign_researchType">
-                    <option value="">Select</option>
-                    @foreach($management as $m)
-                    <option value="{{ $m->id }}">{{ $m->Role }}</option>
-                    @endforeach
-                  </select>
-                </div>
-
-                <div class=" mb-3" id="cohDropdown" style="display: none;">
-                  <label for="teachingSubject" class="form-label">Center of Heads</label>
-                  <select class="form-control" id="Reassign_teachingSubject" name="Reassign_teachingSubject">
-                    <option value="">Select</option>
-                    @foreach($centerofheads as $c)
-                    <option value="{{ $c->id }}">{{ $c->Role }}</option>
-                    @endforeach
-                  </select>
-                </div>
                 <div class="mb-3" id="Reassign_departmentDropdown" style="display: none;">
-                  <label for="department" class="form-label">Department</label>
-                  <div class="dropdown">
-                    <button class="form-control text-start dropdown-toggle" type="button" id="Reassign_deptDropdownBtn"
-                      data-bs-toggle="dropdown">
-                      Select Department
-                    </button>
-                    <ul class="dropdown-menu scrollable-menu" id="Reassign_deptDropdownList">
-                      @foreach($dept as $d)
-                      <li>
-                        <label class="dropdown-item">
-                          <input type="checkbox" class="dept-checkbox" value="{{ $d->dname }}">
-                          {{ $d->dname }}
-                        </label>
-                      </li>
-                      @endforeach
-                    </ul>
-                  </div>
-                  <input type="hidden" name="Reassign_selectedDepartments" id="Reassign_selectedDepartments">
-                </div>
-                <div class="mb-3" id="Reassign_facultyDropdown" style="display: none;">
-                  <label for="faculty" class="form-label">Faculty</label>
-                  <div class="dropdown">
-                    <button class="form-control text-start dropdown-toggle" type="button"
-                      id="Reassign_facultyDropdownBtn" data-bs-toggle="dropdown">
-                      Select Faculty
-                    </button>
-                    <ul class="dropdown-menu scrollable-menu" id="Reassign_facultyDropdownList">
-                      <li><label class="dropdown-item">Select Faculty</label></li>
-                    </ul>
-                  </div>
-                  <input type="hidden" name="Reassign_selectedFaculties" id="Reassign_selectedFaculties">
-                </div>
-                @elseif($specialStatus == 1 && $Role == 'student affiars')
-                <div class="mb-3">
-                  <label for="studentaffiars" class="form-label">select Head</label>
-                  <select class="form-control" id="Reassign_studentaffiars" name="Reassign_studentaffiars" required>
-                    <option value="">Select</option>
-                    @foreach($studentaffiars as $sa)
-                    <option value="{{ $sa->id }}">{{ $sa->Role }}</option>
+                  <label for="Reassign_selectedDepartment" class="form-label">Department</label>
+                  <select class="form-control" name="Reassign_selectedDepartment" id="Reassign_selectedDepartment"
+                    onchange="Reassign_updateSelecteddepartment()">
+                    <option value="">Select Department</option>
+                    @foreach($dept as $d)
+                    <option value="{{ $d->dname }}">
+                      {{ $d->dname }}
+                    </option>
                     @endforeach
                   </select>
+
                 </div>
+
+                <input type="hidden" name="Reassign_selectedDepartments" id="Reassign_selectedDepartments">
+                <div class="mb-3" id="Reassign_facultyDropdown" style="display: none;">
+                  <label for="Reassign_selectedFaculty" class="form-label">Faculty</label>
+                  <select class="form-control" name="Reassign_selectedFaculty" id="Reassign_selectedFaculty"
+                    onchange="Reassign_updateSelectedFaculties()">
+                    <option value="">Select Faculty</option>
+                    <!-- Faculty options will be dynamically populated here -->
+                  </select>
+
+                </div>
+
+
+                <input type="hidden" name="Reassign_selectedFaculties" id="Reassign_selectedFaculties">
                 @elseif($specialStatus == 3 && $Role == 'head of department')
                 <div class="mb-3">
                   <label for="newFaculty" class="form-label">Select Faculty</label>
@@ -1061,7 +1025,9 @@
 
 
 
-      {{-- reassigned faculty modal --}}
+
+
+      {{-- reassigned forward faculty modal --}}
       <div class="modal fade" id="reassignforwardModal" tabindex="-1" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -1072,89 +1038,84 @@
             </div>
 
             <div class="modal-body">
-              <form id="reassignforwardForm">
-                <input type="hidden" id="reassignforwardtaskId" name="task_id">
-                <h5>Faculty_id</h5>
-                <input type="text" id="ffaculty_id" class="form-control" placeholder="Enter">
-                <h5>Name</h5>
-                <input type="text" id="fname" class="form-control" placeholder="Enter name">
 
-                {{-- <form id="reassignform" enctype="multipart/form-data">
-                                <input type="hidden" name="task_id" id="task_id" value="">
-                                <input type="hidden" name="status" id="status" value="">
-                                <input type="hidden" id="hidden_faculty_id" value="{{$facultyId}}" name="faculty_id">
-                <input type="hidden" id="hidden_faculty_name" value="{{ $facultyName }}" name="faculty_name">
-                <div class="mb-3">
-                  <label>Select Role:</label><br>
-                  <select class="form-control" style="width: 100%; height:36px;" name="reassigntype" id="reassigntype"
-                    onchange="toggleForwardTaskSelection()">
-                    <option value="" disabled selected>Select</option>
-                    <option value="hod">HOD</option>
-                    <option value="faculty">Faculty</option>
-                  </select>
-                </div>
+              {{-- <form id="forward_reassignform" enctype="multipart/form-data">
+                                <input type="hidden" name="forward_reassign_task_id" id="forward_reassign_task_id" value="">
+                                <input type="hidden" name="forward_reassign_status" id="forward_reassign_status" value="">
+                                <input type="hidden" id="forward_reassign_hidden_faculty_id" value="{{$facultyId}}"
+              name="faculty_id">
+              <input type="hidden" id="hidden_faculty_name" value="{{ $facultyName }}" name="faculty_name">
+              <div class="mb-3">
+                <label>Select Role:</label><br>
+                <select class="form-control" style="width: 100%; height:36px;" name="reassigntype" id="reassigntype"
+                  onchange="toggleForwardTaskSelection()">
+                  <option value="" disabled selected>Select</option>
+                  <option value="hod">HOD</option>
+                  <option value="faculty">Faculty</option>
+                </select>
+              </div>
 
-                <!-- Multiple Departments for HOD -->
-                <div id="forward-hod-section" style="display: none;">
-                  <div class="form-group">
-                    <label for="forward-hod-departments">Departments</label>
-                    <div class="dropdown" style="width: 100%; position: relative;">
-                      <button type="button" class="form-control" id="forward-hod-departments-btn" aria-expanded="false"
-                        onclick="toggleForwardTaskDropdown('forward-hod-departments-dropdown', 'forward-hod-departments-btn')"
-                        style="text-align : left;">Select</button>
-                      <div class="dropdown-content" id="forward-hod-departments-dropdown"
-                        style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
-                        <label><input type="checkbox" id="forward-hod-selectAll" value="all"> All</label><br>
-                        @foreach ($dept as $d)
-                        <label><input type="checkbox" name="forward-hod-dname[]" value="{{ $d->dname }}"
-                            class="forward-hod-checkbox-item"> {{ $d->dname }}</label><br>
-                        @endforeach
-                      </div>
+              <!-- Multiple Departments for HOD -->
+              <div id="forward-hod-section" style="display: none;">
+                <div class="form-group">
+                  <label for="forward-hod-departments">Departments</label>
+                  <div class="dropdown" style="width: 100%; position: relative;">
+                    <button type="button" class="form-control" id="forward-hod-departments-btn" aria-expanded="false"
+                      onclick="toggleForwardTaskDropdown('forward-hod-departments-dropdown', 'forward-hod-departments-btn')"
+                      style="text-align : left;">Select</button>
+                    <div class="dropdown-content" id="forward-hod-departments-dropdown"
+                      style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
+                      <label><input type="checkbox" id="forward-hod-selectAll" value="all"> All</label><br>
+                      @foreach ($dept as $d)
+                      <label><input type="checkbox" name="forward-hod-dname[]" value="{{ $d->dname }}"
+                          class="forward-hod-checkbox-item"> {{ $d->dname }}</label><br>
+                      @endforeach
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <!-- Multiple Departments for Faculty -->
-                <div id="forward-faculty-section" style="display: none;">
-                  <div class="form-group">
-                    <label for="forward-faculty-departments">Departments</label>
-                    <div class="dropdown" style="width: 100%; position: relative;">
-                      <button type="button" class="form-control" id="forward-faculty-departments-btn"
-                        aria-expanded="false"
-                        onclick="toggleForwardTaskDropdown('forward-faculty-departments-dropdown', 'faculty-departments-btn')"
-                        style="text-align : left;">Select</button>
-                      <div class="forward-dropdown-content" id="forward-faculty-departments-dropdown"
-                        style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
-                        <label><input type="checkbox" id="forward-faculty-selectAll" value="all"> All</label><br>
-                        @foreach ($dept as $d)
-                        <label><input type="checkbox" name="forward-faculty-dname[]" value="{{ $d->dname }}"
-                            class="forward-faculty-checkbox-item"> {{ $d->dname }}</label><br>
-                        @endforeach
-                      </div>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label for="forward-department-faculty">Faculty</label>
-                    <div class="dropdown" style="width: 100%; position: relative;">
-                      <button type="button" class="form-control" id="forward-department-faculty" aria-expanded="false"
-                        onclick="toggleForwardTaskDrop('forward-departments-faculty-dropdown', 'forward-department-faculty')"
-                        style="text-align : left;">Select</button>
-                      <div class="dropdown-content" id="forward-departments-faculty-dropdown"
-                        style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
-                      </div>
+              <!-- Multiple Departments for Faculty -->
+              <div id="forward-faculty-section" style="display: none;">
+                <div class="form-group">
+                  <label for="forward-faculty-departments">Departments</label>
+                  <div class="dropdown" style="width: 100%; position: relative;">
+                    <button type="button" class="form-control" id="forward-faculty-departments-btn"
+                      aria-expanded="false"
+                      onclick="toggleForwardTaskDropdown('forward-faculty-departments-dropdown', 'faculty-departments-btn')"
+                      style="text-align : left;">Select</button>
+                    <div class="forward-dropdown-content" id="forward-faculty-departments-dropdown"
+                      style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
+                      <label><input type="checkbox" id="forward-faculty-selectAll" value="all"> All</label><br>
+                      @foreach ($dept as $d)
+                      <label><input type="checkbox" name="forward-faculty-dname[]" value="{{ $d->dname }}"
+                          class="forward-faculty-checkbox-item"> {{ $d->dname }}</label><br>
+                      @endforeach
                     </div>
                   </div>
                 </div>
+                <div class="form-group">
+                  <label for="forward-department-faculty">Faculty</label>
+                  <div class="dropdown" style="width: 100%; position: relative;">
+                    <button type="button" class="form-control" id="forward-department-faculty" aria-expanded="false"
+                      onclick="toggleForwardTaskDrop('forward-departments-faculty-dropdown', 'forward-department-faculty')"
+                      style="text-align : left;">Select</button>
+                    <div class="dropdown-content" id="forward-departments-faculty-dropdown"
+                      style="display: none; background-color: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; position: absolute; width: 100%; z-index: 1000;">
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                <div class="mb-3">
-                  <label for="deadline" class="form-label">Deadline</label>
-                  <input type="date" class="form-control" name="forwarddeadline" id="forwarddeadline" required>
-                </div>
-                <input type="hidden" class="form-control" name="forwarded_date" id="forwarded_date" required> --}}
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-primary" id="reassignforwardsubmit">Submit</button>
-                </div>
+              <div class="mb-3">
+                <label for="deadline" class="form-label">Deadline</label>
+                <input type="date" class="form-control" name="forwarddeadline" id="forwarddeadline" required>
+              </div>
+              <input type="hidden" class="form-control" name="forwarded_date" id="forwarded_date" required> --}}
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" id="reassignforwardsubmit">Submit</button>
+              </div>
               </form>
             </div>
           </div>
@@ -1265,6 +1226,9 @@
           </div>
         </div>
       </div>
+      <!-------------------- Reassign modal -------------------------------->
+      <!------------
+
 
       <!-------------------- Footer -------------------------------->
       <footer class="footer">
@@ -2085,6 +2049,7 @@
     $(document).on('click', '.showForwardedFaculty', function(e) {
       e.preventDefault();
 
+
       const fullValue = $(this).val(); // Get the concatenated value
       const values = fullValue.split('-'); // Split the string using the hyphen as a delimiter
       const id = values[0]; // First part is task_id
@@ -2404,7 +2369,6 @@
         }
       );
     });
-
     //reassign modal
     $(document).on('click', '.btnreassign', function(e) {
       e.preventDefault();
@@ -2414,20 +2378,18 @@
     });
     $(document).on('click', '#reassignsubmit', function(e) {
       e.preventDefault();
-      var taskId = $('#reassigntaskId').val();
-      var facultyId = $('#faculty_id').val();
-      var name = $('#name').val();
+      var formData = new FormData($('#reassignForm')[0]);
+
+
       var token = $('meta[name="csrf-token"]').attr('content');
 
       $.ajax({
         type: 'POST',
         url: `/store-reassign`,
-        data: {
-          task_id: taskId,
-          faculty_id: facultyId,
-          name: name,
-          _token: token
-        },
+
+        data: formData,
+        processData: false,
+        contentType: false,
         success: function(response) {
           if (response.status === 200) {
             alertify.success('Task reassigned successfully!');
@@ -2711,7 +2673,8 @@
 
         const selectedFaculties = Array.from(document.querySelectorAll('.faculty-checkbox:checked')).map(cb => cb
           .value);
-        const selectedFacultyNames = Array.from(document.querySelectorAll('.faculty-checkbox:checked')).map(cb => cb
+        const selectedFacultyNames = Array.from(document.querySelectorAll('.faculty-checkbox:checked')).map(cb =>
+          cb
           .parentElement.textContent.trim());
 
         // Display logic: if more than 2 selected, show count; otherwise, show names
@@ -2897,6 +2860,87 @@
 
       document.getElementById('selectedcoordinators').value = selectedValues.join(',');
     }
+
+    // REASSIGN TASK
+    function Reassign_showDropdown() {
+      var workType = document.getElementById("Reassign_workType").value;
+      var departmentDropdown = document.getElementById("Reassign_departmentDropdown");
+      var facultyDropdown = document.getElementById("Reassign_facultyDropdown");
+
+      if (workType === "hod") {
+        departmentDropdown.style.display = "block";
+        facultyDropdown.style.display = "none";
+
+      } else if (workType === "faculty") {
+        departmentDropdown.style.display = "block";
+        facultyDropdown.style.display = "block";
+      } else {
+        departmentDropdown.style.display = "none";
+        facultyDropdown.style.display = "none";
+      }
+    }
+
+    function Reassign_updateSelecteddepartment() {
+      var selectedDepartment = document.getElementById("Reassign_selectedDepartment").value;
+      document.getElementById("Reassign_selectedDepartments").value = selectedDepartment;
+
+      if (selectedDepartment) {
+        fetchFacultyOptions(selectedDepartment);
+      } else {
+        document.getElementById("Reassign_selectedFaculty").innerHTML = '<option value="">Select Faculty</option>';
+      }
+    }
+
+    function fetchFacultyOptions(department) {
+      fetch(`/get-faculty-by-department/${department}`)
+        .then(response => response.json())
+        .then(data => {
+          var facultyDropdown = document.getElementById("Reassign_selectedFaculty");
+          facultyDropdown.innerHTML = '<option value="">Select Faculty</option>';
+          data.forEach(faculty => {
+            facultyDropdown.innerHTML += `<option value="${faculty.id}">${faculty.name}</option>`;
+          });
+        })
+        .catch(error => console.error("Error fetching faculty:", error));
+    }
+
+    function Reassign_updateSelectedFaculties() {
+      var selectedFaculty = document.getElementById("Reassign_selectedFaculty").value;
+      document.getElementById("Reassign_selectedFaculties").value = selectedFaculty;
+    }
+
+
+    Reassign_deptDropdownBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      Reassign_deptDropdownList.style.display = Reassign_deptDropdownList.style.display === "block" ?
+        "none" :
+        "block";
+    });
+
+    Reassign_facultyDropdownBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      Reassign_facultyDropdownList.style.display = Reassign_facultyDropdownList.style.display === "block" ?
+        "none" : "block";
+    });
+
+    document.addEventListener("click", (e) => {
+
+      if (!Reassign_deptDropdownBtn.contains(e.target)) Reassign_deptDropdownList.style.display = "none";
+      if (!Reassign_facultyDropdownBtn.contains(e.target)) Reassign_facultyDropdownList.style.display =
+        "none";
+    });
+
+    document.querySelectorAll(".dept-checkbox").forEach(checkbox => {
+      checkbox.addEventListener("change", Reassign_updateSelectedDepartments);
+    });
+    Reassign_deptDropdownList.addEventListener("click", (e) => e.stopPropagation());
+    Reassign_facultyDropdownList.addEventListener("click", (e) => e.stopPropagation());
+
+    document.addEventListener("change", (e) => {
+      if (e.target.classList.contains("faculty-checkbox")) {
+        Reassign_updateSelectedFaculties();
+      }
+    });
     </script>
 </body>
 
