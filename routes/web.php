@@ -53,7 +53,7 @@ Route::get('/main', [mainController::class,"main"]) -> name('main');
 Route::Post('add/role', [mainController::class, "addRole"]);
 //reassign
 Route::post('/store-reassign', [UserController::class, 'storeReassign']);
-Route::post('/store-reassignforward', [UserController::class, 'storeReassignforward']);
+Route::post('/store-reassignforward/{id}', [UserController::class, 'storeReassignforward']);
 Route::post('/tasks/update-status/{id}', [UserController::class, 'ReassignDate']);
 //extend dealine
 Route::get('/task/{id}', [UserController::class, 'getedeadline']);
@@ -69,3 +69,5 @@ Route::post('/save-feedback', [userController::class, 'saveFeedback'])->name('ex
 //NEW ADD TASK
 Route::get('/getFaculties', [UserController::class, 'getFaculties'])->name('get.faculties');
 Route::get('/faculty-selection', [UserController::class, 'index'])->name('faculty.selection');
+//reassign task
+Route::get('/get-faculty-by-department/{department}', [UserController::class, 'getFacultyByDepartment']);

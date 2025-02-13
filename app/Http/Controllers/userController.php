@@ -33,14 +33,12 @@ class userController extends Controller
 
         // Find the user in the Faculty model
         $faculty = Faculty::where('id', $request->faculty_id)->first();
-        $specialrole = specialrole::where('id', $request->faculty_id)->first();
         if ($faculty && $faculty->pass === $request->password) {
             session([
                 'faculty_id' => $faculty->id,
                 'role' => $faculty->role,
                 'faculty_name' => $faculty->name,
                 'department' => $faculty->dept,
-                'specialrole' => $specialrole->dept,
             ]);
 
             return response()->json([
@@ -62,21 +60,26 @@ class userController extends Controller
         $role = session('role');
         $facultyName = session('faculty_name');
         $department = session('department');
-        $specialrole = session('specialrole');
         $dept = Department::all();
         $deptfaculty = Faculty::where('status', '1')->where('id', '!=', $facultyId)->get();
-        $assigned_task = Maintask::select('task_id', 'title', 'description', 'deadline')->where('status', 0)->where('assigned_by_id', $facultyId)->groupBy('task_id', 'title', 'description', 'deadline')->get();
+        $assigned_task = Maintask::select('task_id', 'title', 'description', 'deadline')
+            ->where('status', 0)
+            ->where('assigned_by_id', $facultyId)
+            ->groupBy('task_id', 'title', 'description', 'deadline')
+            ->orderBy('deadline')
+            ->get();
+
         $dashboard_assigned_task = Maintask::where('status', 0)
             ->where('assigned_by_id', $facultyId)
             ->count();
 
-
-        $management =  Specialrole::select('Specialrole.Role', 'Specialrole.id', 'faculty.name')
-            ->where('Specialrole.type', 'Management')
-            ->where('specialrole.Role', '!=' ,'Principal',$facultyId)
+        $management = Specialrole::select('specialrole.Role', 'specialrole.id', 'faculty.name')
+            ->where('specialrole.type', 'Management')
+            ->where('specialrole.Role', '!=', 'Principal')
             ->join('faculty', 'faculty.id', '=', 'specialrole.id')
             ->distinct()
             ->get();
+
         $centerofheads = Specialrole::select('Specialrole.Role', 'Specialrole.id', 'faculty.name')
             ->where('Specialrole.type', 'center of heads')
             ->where('Specialrole.status', '2')
@@ -583,7 +586,7 @@ class userController extends Controller
     {
         $type = $request->input('type');
         $Role = $request->input('role');
-        
+
         if ($type == 'center of heads') {
             $coordinators = $request->input('selectedcoordinators');
             $coordinatorfac = explode(',', $coordinators);
@@ -613,13 +616,13 @@ class userController extends Controller
                     'status' => 400,
                 ]);
             }
-        } else if($Role == 'student affiars'){
+        } else if ($Role == 'student affiars') {
             $coh = $request->input('fstudentaffiars');
             $data = Faculty::where('id', $coh)
-                    ->where('role', 'faculty')
-                    ->select('id', 'name')
-                    ->where('status', '1')
-                    ->get();
+                ->where('role', 'faculty')
+                ->select('id', 'name')
+                ->where('status', '1')
+                ->get();
         } else {
             return response()->json([
                 'status' => 500,
@@ -705,9 +708,9 @@ class userController extends Controller
                     ]
                 );
 
-            return response()->json(['success' => true, 'message' => 'Task completed successfully.']);
+            return response()->json(['success' => True, 'message' => 'Task completed successfully.']);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+            return response()->json(['success' => False, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
     public function storeReason(Request $request, $id)
@@ -1062,32 +1065,159 @@ class userController extends Controller
         // Return the total demerit points
         return response()->json(['demerit_points' => $totalDemeritPoints]);
     }
-    public function storeReassign(request $request)
+    public function storeReassign(Request $request)
     {
-        $reassign = Mainbranch::find($request->task_id);
-        if ($reassign) {
-            $reassign->assigned_to_id = $request->faculty_id;
-            $reassign->assigned_to_name = $request->name;
-            $reassign->status = '0';
-            $reassign->save();
+        // Get work type
+        $specialStatus = $request->Reassign_specialStatus;
+        $specialrole = $request->Reassign_Role;
+
+        if ($specialStatus == 0 && $specialrole == "Principal") {
+            $workType = $request->input("Reassign_workType");
+
+            if ($workType == "hod") {
+                // Get selected department
+                $facultydept = $request->input("Reassign_selectedDepartment");
+
+                // Find an HOD for the selected department
+                $hod = Faculty::where('dept', $facultydept)
+                    ->where('role', 'hod')
+                    ->where('status', '1')
+                    ->select('id', 'name')
+                    ->first(); // ✅ Fetch a single record
+
+                if (!$hod) {
+                    return response()->json([
+                        'status' => 404,
+                        'message' => 'No HOD found for the selected department'
+                    ]);
+                }
+
+                // Find the task to reassign
+                $reassign = Mainbranch::find($request->Reassign_task_id);
+
+                if ($reassign) {
+                    // Assign the task to the found HOD
+                    $reassign->assigned_to_id = $hod->id;
+                    $reassign->assigned_to_name = $hod->name;
+                    $reassign->status = '0';
+                    $reassign->save();
+
+                    return response()->json([
+                        'status' => 200,
+                        'message' => 'Task successfully reassigned'
+                    ]);
+                }
+
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Task not found'
+                ]);
+            } else if ($workType == "faculty") {
+                $faculty = $request->input("Reassign_selectedFaculty");
+
+                // Find the faculty
+                $fac = Faculty::where('id', $faculty)
+                    ->where('role', 'Faculty')
+                    ->where('status', '1')
+                    ->select('id', 'name')
+                    ->first();
+
+                if (!$fac) {
+                    return response()->json([
+                        'status' => 404,
+                        'message' => 'No faculty found'
+                    ]);
+                }
+
+                // Find the task to reassign
+                $reassign = Mainbranch::find($request->Reassign_task_id);
+
+                if ($reassign) {
+                    $reassign->assigned_to_id = $fac->id;
+                    $reassign->assigned_to_name = $fac->name;
+                    $reassign->status = '0';
+                    $reassign->save();
+
+                    return response()->json([
+                        'status' => 200,
+                        'message' => 'Task successfully reassigned'
+                    ]);
+                }
+
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Task not found'
+                ]);
+            }
 
             return response()->json([
-                'status' => 200,
-                'message' => 'Task reassigned successfully!'
+                'status' => 500,
+                'message' => 'Invalid work type'
             ]);
-        } else {
+        } else if ($specialStatus == 3 && $specialrole == "head of department") {
+            $faculty = $request->input("Reassign_selecteddeptFaculty"); // ✅ Removed `:` from key
+
+            // Find the faculty
+            $fac = Faculty::where('id', $faculty)
+                ->where('role', 'Faculty')
+                ->where('status', '1')
+                ->select('id', 'name')
+                ->first();
+
+            if (!$fac) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'No faculty found'
+                ]);
+            }
+
+            // Find the task to reassign
+            $reassign = Mainbranch::find($request->Reassign_task_id);
+
+            if ($reassign) {
+                $reassign->assigned_to_id = $fac->id;
+                $reassign->assigned_to_name = $fac->name;
+                $reassign->status = '0';
+                $reassign->save();
+
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Task successfully reassigned'
+                ]);
+            }
+
+            return response()->json([
+                'status' => 400,
+                'message' => 'Task not found'
+            ]);
+        }
+
+        // Handle unexpected specialStatus
+        return response()->json([
+            'status' => 500,
+            'message' => 'Invalid special status or role'
+        ]);
+    }
+
+    public function storeReassignforward(Request $request, $id)
+    {
+        $reassignforward = $request->input('forward_reassign_selectedforwarddeptFaculties');
+        $fdata = Faculty::where('id', $reassignforward)
+            ->where('role', 'Faculty')
+            ->select('id', 'name')
+            ->where('status', '1')
+            ->first();
+        if (!$fdata) {
             return response()->json([
                 'status' => 404,
                 'message' => 'Task not found!'
             ]);
         }
-    }
-    public function storeReassignforward(request $request)
-    {
-        $reassign = Subtask::find($request->task_id);
+        $reassign = Subtask::find($id);
         if ($reassign) {
-            $reassign->assigned_to_id = $request->ffaculty_id;
-            $reassign->assigned_to_name = $request->fname;
+
+            $reassign->assigned_to_id = $fdata->id;
+            $reassign->assigned_to_name = $fdata->name;
             $reassign->status = '0';
             $reassign->save();
 
@@ -1231,6 +1361,15 @@ class userController extends Controller
         if ($faculties->isEmpty()) {
             return response()->json(['error' => 'No faculty found for selected departments'], 404);
         }
+
+        return response()->json($faculties);
+    }
+    public function getFacultyByDepartment($department)
+    {
+        $faculties = DB::table('faculty')
+            ->where('dept', $department)
+            ->select('id', 'name', 'dept')
+            ->get();
 
         return response()->json($faculties);
     }
