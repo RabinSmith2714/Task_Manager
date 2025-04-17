@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $assigned_date
  * @property Carbon|null $completed_date
  * @property int|null $status
- * @property int|null $forward_count
+ * @property string|null $complexity_level
  * @property Carbon|null $deadline
  * 
  * @property Collection|Mainbranch[] $mainbranches
@@ -41,7 +41,6 @@ class Maintask extends Model
 		'assigned_date' => 'datetime',
 		'completed_date' => 'datetime',
 		'status' => 'int',
-		'forward_count' => 'int',
 		'deadline' => 'datetime'
 	];
 
@@ -53,7 +52,7 @@ class Maintask extends Model
 		'assigned_date',
 		'completed_date',
 		'status',
-		'forward_count',
+		'complexity_level',
 		'deadline'
 	];
 
@@ -71,4 +70,8 @@ class Maintask extends Model
 	{
 		return $this->hasMany(Subtask::class, 'task_id');
 	}
+	public function mainbranch()
+    {
+        return $this->hasMany(Mainbranch::class, 'task_id', 'task_id');
+    }
 }

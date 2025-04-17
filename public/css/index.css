@@ -25,11 +25,48 @@
     transform: scale(1.05);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+.btn-secondary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.btn-info:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.btn-success:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.btn-danger:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.btn-lightgreen:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.btn-warning:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 
 /* Button effect */
 .btn-primary {
     transition: all 0.3s ease;
 }
+.btn-secondary {
+    transition: all 0.3s ease;
+}
+.btn-danger {
+    transition: all 0.3s ease;
+}
+.btn-info{
+    transition: all 0.3s ease;
+}
+.btn-success {
+    transition: all 0.3s ease;
+}
+
 
 /* Space between date and table */
 #forwardfacultyDetailsHeader {
@@ -124,9 +161,17 @@ body {
 }
 
 /* Table Styles */
-.custom-table {
+.custom-table-container {
+    max-height: 400px; /* Adjust height as needed */
+    overflow-y: auto;
+    overflow-x: auto;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Keeps column widths fixed */
 }
 
 .custom-table thead {
@@ -147,15 +192,19 @@ body {
     font-size: 0.9em;
 }
 
-.custom-table th {
-    font-weight: 500;
-    padding: 15px;
-}
-
-
-.custom-table td {
+.custom-table th, .custom-table td {
+    width: 200px; /* Adjust column width as needed */
+    word-wrap: break-word;
+    white-space: normal; /* Allow text to wrap */
     padding: 15px;
     border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+/* Ensure text wraps inside the column */
+.custom-table td {
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 /* Responsive Styles */
@@ -664,7 +713,7 @@ body {
     z-index: 1000;
     overflow-y: auto;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    background-image: url('image/pattern_h.png');
+    background-image: url('../image/pattern_h.png');
 }
 
 .sidebar::-webkit-scrollbar {
@@ -1209,7 +1258,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    background: linear-gradient(135deg, #8e44ad, #3498db);
+    background-image: url('../image/pattern_h.png');
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -1221,7 +1270,7 @@ body {
     font-family: 'Arial', sans-serif;
     font-weight: bold;
     font-size: 14px;
-    color: #fff;
+    color: #000000;
 }
 
 .filter-input-inline {
@@ -1279,7 +1328,7 @@ body {
 
 /* Card style */
 .date-card {
-    background: linear-gradient(135deg, rgb(44, 208, 237), rgb(91, 185, 236));
+    background-image: url('../image/pattern_h.png');
     /* Soft pastel colors */
     color: #2c3e50;
     /* Dark text for readability */
@@ -1344,4 +1393,101 @@ body {
     /* Fully visible */
     transform: translateY(0);
     /* Slide to original position */
+}
+
+.filter-container-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-image: url('../image/history.png');
+    background-size: cover;  
+    background-position: center; 
+    background-repeat: no-repeat; 
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 70%;
+    margin: auto;
+}
+
+.custom-card {
+    background-image: url('../image/pattern_h.png');
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat; 
+    border: none;
+    border-radius: 20px;
+    padding: 8px;
+    color: black;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: min-content;
+    height: 155px;
+}
+
+.custom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(170, 170, 170, 0.6);
+}
+
+.custom-card .card-title {
+    font-size: medium;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+}
+
+.custom-card .card-text {
+    font-size: 2.6rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Apply styles only to nav-links inside .custom-tabs */
+.custom-tabs .nav-link {
+    background: linear-gradient(135deg, rgb(30, 144, 255), rgb(255, 105, 180));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: white;
+    border: 1px solid rgb(30, 144, 255);
+    background-color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Active tab style */
+.custom-tabs .nav-link.active {
+    color: white !important;
+    background: linear-gradient(135deg, rgb(30, 144, 255), rgb(255, 105, 180));
+    border-color: rgb(30, 144, 255) !important;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: unset;
+}
+
+/* Hover effect for non-active tabs */
+.custom-tabs .nav-link:not(.active):hover {
+    background: linear-gradient(135deg, rgb(30, 144, 255), rgb(255, 105, 180)) !important;
+    color: white !important;
+    border-color: rgb(30, 144, 255) !important;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: unset;
+}
+
+tbody td,
+tbody th {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+tbody td {
+    font-feature-settings: "tnum";
+    text-align: center !important;
+}
+
+@media (max-width: 768px) {
+    .filter-container-inline {
+        flex-direction: column;
+        max-width: 90%;
+        padding: 20px;
+    }
 }
