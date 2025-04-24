@@ -26,12 +26,10 @@
     .dropdown {
         position: relative;
         width: 100%;
-        /* Ensure full width */
     }
 
     .dropdown-menu {
         width: 100%;
-        /* Same width as button */
         max-height: 250px;
         overflow-y: auto;
     }
@@ -49,13 +47,11 @@
         display: block !important;
     }
 
-    /* Ensure that dropdown is initially hidden */
     #deptDropdownList,
     #facultyDropdownList {
         display: none;
     }
 
-    /* Show dropdown when .show class is added */
     #deptDropdownList.show,
     #facultyDropdownList.show {
         display: block;
@@ -63,14 +59,12 @@
 
     #deptDropdownBtn {
         white-space: normal;
-        /* Allow text to break onto multiple lines */
         word-wrap: break-word;
         max-width: 100%;
     }
 
     .btn-lightgreen {
         background-color: rgba(11, 196, 125, 0.99);
-        /* Light green color */
         border-color: rgba(45, 211, 137, 0.81);
         color: rgb(0, 0, 0);
     }
@@ -78,7 +72,6 @@
 
     .btn-lightgreen:hover {
         background-color: rgba(17, 199, 144, 0.99);
-        /* Slightly darker green on hover */
         border-color: rgba(17, 199, 138, 0.99);
     }
     </style>
@@ -129,6 +122,7 @@
                 <span>{{ $facultyName }}</span>
             </div>
         </div>
+        
         <!-- Breadcrumb -->
         <div class="breadcrumb-area">
             <nav aria-label="breadcrumb">
@@ -242,6 +236,7 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            
                                             <div class="mb-3 col-12 col-md-3">
                                                 <div class="circle-card" style="background-color: rgb(187, 187, 35);">
                                                     <div class="text-center">
